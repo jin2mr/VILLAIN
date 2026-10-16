@@ -3,966 +3,966 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#08070d">
 <title>PROJECT VILLAIN | 人物相関図</title>
 
 <style>
 :root {
-  --bg: #07070b;
-  --panel: #13131c;
-  --border: #34313e;
-  --text: #f5f2f8;
-  --muted: #aaa5b8;
-  --accent: #e253a7;
+  --bg: #08070d;
+  --panel: #17111d;
+  --text: #f7f0f8;
+  --muted: #b7a9be;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
-  background: var(--bg);
+  background:
+    radial-gradient(ellipse at 50% 20%, #29182e, transparent 60%),
+    var(--bg);
   color: var(--text);
-  font-family:
-    "Noto Sans JP",
-    "Hiragino Kaku Gothic ProN",
-    "Yu Gothic",
-    sans-serif;
+  font-family: "Noto Sans JP", "Yu Gothic", sans-serif;
 }
 
-header {
-  padding: 32px 14px 20px;
-  text-align: center;
-}
+button { font: inherit; }
 
-header small {
-  color: var(--accent);
-  letter-spacing: 4px;
-  font-size: 11px;
-  font-weight: bold;
-}
-
-h1 {
-  margin: 10px 0;
-  font-size: clamp(21px, 5vw, 32px);
-  letter-spacing: 2px;
-}
-
-.subtitle {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.9;
+button:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 4px;
 }
 
 .container {
   max-width: 980px;
   margin: auto;
-  padding: 12px;
+  padding: 26px 10px 65px;
+}
+
+.eyebrow {
+  text-align: center;
+  color: #bca0c5;
+  font-size: 10px;
+  letter-spacing: .25em;
+}
+
+h1 {
+  text-align: center;
+  font-family: Georgia, serif;
+  font-size: clamp(25px, 5vw, 43px);
+  letter-spacing: .12em;
+  margin: 8px 0;
+}
+
+.subtitle {
+  text-align: center;
+  color: #c7b9cc;
+  font-size: 12px;
+  margin-bottom: 27px;
 }
 
 /* 相関図全体 */
 
-.chart {
+.board {
   position: relative;
+  isolation: isolate;
   width: 100%;
-  aspect-ratio: 1 / 1.13;
-  min-height: 440px;
-  max-height: 850px;
+  aspect-ratio: 1 / 1.03;
+  border: 1px solid #58435f;
+  border-radius: 22px;
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 18px;
   background:
-    radial-gradient(
-      ellipse at center,
-      #211a2c 0%,
-      #100e17 55%,
-      #07070b 100%
-    );
+    radial-gradient(ellipse at center, #271a2d, #09070d 75%);
+  box-shadow: 0 18px 55px #0009;
 }
 
-.chart::before {
+.board::before {
   content: "";
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(#ffffff06 1px, transparent 1px),
-    linear-gradient(90deg, #ffffff06 1px, transparent 1px);
-  background-size: 30px 30px;
+    linear-gradient(#ffffff08 1px, transparent 1px),
+    linear-gradient(90deg, #ffffff08 1px, transparent 1px);
+  background-size: 32px 32px;
   pointer-events: none;
 }
 
-.chart svg {
+/* 中央の鎖と蝶の背景 */
+
+.center-art {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-/* 関係線 */
-
-.connection {
-  stroke: #777080;
-  stroke-width: 1.5;
-  stroke-dasharray: 5 6;
-  opacity: .5;
-  transition: .3s ease;
-  vector-effect: non-scaling-stroke;
+  left: 19%;
+  top: 28%;
+  width: 62%;
+  height: 44%;
+  background:
+    url("images/relationship-bg.png")
+    center / contain no-repeat;
+  opacity: .70;
+  filter: brightness(.76) contrast(1.15);
+  mask-image:
+    radial-gradient(ellipse, black 43%, transparent 76%);
   pointer-events: none;
 }
-
-.connection.active {
-  stroke: var(--line-color);
-  stroke-width: 3.5;
-  stroke-dasharray: none;
-  opacity: 1;
-  filter: drop-shadow(0 0 6px var(--line-color));
-}
-
-.connection.dim {
-  opacity: .05;
-}
-
-.connection-hit {
-  stroke: transparent;
-  stroke-width: 18;
-  pointer-events: stroke;
-  cursor: pointer;
-}
-
-/* キャラクター */
-
-.person {
-  position: absolute;
-  z-index: 2;
-  transform: translate(-50%, -50%);
-  width: 26%;
-  max-width: 190px;
-  min-width: 82px;
-  padding: 8px 5px 10px;
-  border: 1px solid var(--person-color);
-  border-radius: 14px;
-  background: #15131e;
-  color: white;
-  text-align: center;
-  font-family: inherit;
-  cursor: pointer;
-  box-shadow: 0 5px 18px #000a;
-  transition:
-    opacity .25s,
-    box-shadow .25s,
-    transform .25s,
-    background .25s;
-}
-
-.person.active {
-  z-index: 3;
-  background: #282031;
-  box-shadow:
-    0 0 22px var(--person-color),
-    0 6px 20px #000a;
-  transform: translate(-50%, -50%) scale(1.06);
-}
-
-.person.dim {
-  opacity: .2;
-}
-
-/* 正方形画像 */
-
-.avatar {
-  width: min(100%, 125px);
-  aspect-ratio: 1 / 1;
-  margin: 0 auto 8px;
-  border: 1px solid var(--person-color);
-  border-radius: 10px;
-  overflow: hidden;
-  background: #272332;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.avatar img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.person-name {
-  display: block;
-  font-size: 15px;
-  font-weight: bold;
-}
-
-.person-role {
-  display: block;
-  margin-top: 4px;
-  font-size: 10px;
-  color: #c3bccc;
-}
-
-/* 中央のロゴ */
 
 .center-label {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  color: #ffffff24;
-  font-size: clamp(20px, 5vw, 44px);
-  font-weight: 900;
-  letter-spacing: 4px;
+  font-family: Georgia, serif;
+  font-size: clamp(8px, 1.4vw, 13px);
+  letter-spacing: .25em;
+  color: #e4cde0a8;
+  text-shadow: 0 2px 10px black;
+  white-space: nowrap;
   pointer-events: none;
 }
 
-/* 説明パネル */
+/* 関係線 */
 
-.info {
-  margin-top: 18px;
-  padding: 22px;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: var(--panel);
-  min-height: 150px;
+.lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
 }
 
-.info h2 {
-  margin: 0 0 9px;
-  font-size: 21px;
+.link-line {
+  stroke: #b7a0c0;
+  stroke-width: .32;
+  stroke-dasharray: 1.1 1.5;
+  opacity: .25;
+  transition: opacity .3s, stroke-width .3s;
 }
 
-.info-role {
-  margin: 0 0 16px;
-  color: var(--muted);
-  font-size: 12px;
+.link-line.active {
+  stroke: var(--line-color, #e7b8ff);
+  stroke-width: .75;
+  stroke-dasharray: none;
+  opacity: 1;
+  filter: drop-shadow(0 0 1px var(--line-color));
+}
+
+/* キャラクターカード */
+
+.character {
+  position: absolute;
+  z-index: 2;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
+  width: 27%;
+  max-width: 205px;
+  padding: 8px 8px 11px;
+  border: 1px solid var(--color);
+  border-radius: 15px;
+  background: linear-gradient(150deg, #231a29f5, #100d16fa);
+  color: white;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 5px 20px #0009;
+  transition:
+    transform .3s,
+    box-shadow .3s,
+    opacity .3s,
+    filter .3s;
+}
+
+.character:hover,
+.character.selected {
+  transform: translate(-50%, -50%) scale(1.045);
+  box-shadow:
+    0 0 0 1px var(--color),
+    0 0 25px var(--color),
+    0 10px 25px #000b;
+}
+
+.character.dimmed {
+  opacity: .32;
+  filter: grayscale(.55);
+}
+
+.portrait {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: center;
+  border: 1px solid var(--color);
+  border-radius: 9px;
+  background: #08070c;
+}
+
+.character-name {
+  margin-top: 6px;
+  font-weight: 800;
+  font-size: clamp(13px, 2.5vw, 20px);
+}
+
+.character-role {
+  margin-top: 2px;
+  color: #c6b9cd;
+  font-size: clamp(9px, 1.6vw, 12px);
+}
+
+.board-footer {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: .12em;
+  color: #bba6c2;
+}
+
+/* 関係説明パネル */
+
+.details {
+  margin-top: 20px;
+  padding: 24px;
+  border: 1px solid #55405c;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #201627, #110d17);
+  box-shadow: 0 12px 35px #0008;
+}
+
+.details-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.file-number {
+  color: #bba2c5;
+  font-size: 10px;
+  letter-spacing: .15em;
+}
+
+.details h2 {
+  margin: 7px 0;
+  font-size: 27px;
+}
+
+.details-summary {
+  color: #d0c2d5;
+  font-size: 13px;
   line-height: 1.8;
 }
 
-.relation {
-  padding: 15px 0;
-  border-top: 1px solid var(--border);
+.stamp {
+  padding: 5px 8px;
+  border: 1px solid #82648a;
+  color: #e1c2e8;
+  font-size: 9px;
+  white-space: nowrap;
 }
 
-.relation strong {
-  font-size: 14px;
+.separator {
+  height: 1px;
+  margin: 20px 0;
+  background: linear-gradient(90deg, #80618b, transparent);
 }
 
-.relation p {
-  margin: 8px 0;
-  color: #ccc5d5;
-  font-size: 13px;
-  line-height: 1.85;
+.relation-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
-.tag {
-  display: inline-block;
-  padding: 4px 9px;
-  border: 1px solid #825072;
-  border-radius: 30px;
-  color: #f1bbdb;
+.relation-card {
+  padding: 14px;
+  border: 1px solid #57445f;
+  border-radius: 12px;
+  background: #291d30;
+}
+
+.relation-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.relation-name {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.relation-status {
+  border: 1px solid #82648a;
+  border-radius: 20px;
+  padding: 3px 7px;
+  color: #e8caed;
   font-size: 10px;
+  white-space: nowrap;
 }
 
-/* リセットボタン */
+.relation-card p {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.85;
+  color: #d5c7db;
+}
 
-.reset {
-  display: block;
-  margin: 20px auto;
-  padding: 12px 25px;
-  border: 1px solid #777080;
+.placeholder {
+  color: #c9b9d0;
+  font-size: 13px;
+}
+
+.reset-area {
+  text-align: center;
+  margin-top: 18px;
+}
+
+.reset-button {
+  padding: 10px 24px;
+  border: 1px solid #785b82;
   border-radius: 30px;
-  background: transparent;
+  background: #271c2d;
   color: white;
-  font-family: inherit;
   cursor: pointer;
 }
 
-.reset:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+.reset-button:hover {
+  background: #41304b;
 }
 
-footer {
-  padding: 24px 12px 36px;
-  color: #85808f;
+.note {
+  margin-top: 18px;
   text-align: center;
+  color: #a99aaf;
   font-size: 11px;
-  line-height: 1.9;
+  line-height: 1.8;
 }
 
-/* スマホ表示 */
+/* スマホ */
 
 @media (max-width: 600px) {
-
-  .chart {
-    aspect-ratio: 1 / 1.45;
-    min-height: 510px;
+  .container {
+    padding: 23px 9px 50px;
   }
 
-  .person {
+  .board {
+    aspect-ratio: .75;
+  }
+
+  .character {
     width: 29%;
-    padding: 5px 4px 7px;
-    border-radius: 10px;
+    padding: 5px 5px 8px;
+    border-radius: 11px;
   }
 
-  .avatar {
-    width: 100%;
-    max-width: 100px;
-    margin-bottom: 5px;
+  .portrait {
     border-radius: 7px;
   }
 
-  .person-name {
-    font-size: 12px;
+  .character-name {
+    margin-top: 4px;
   }
 
-  .person-role {
+  .character-role {
     font-size: 9px;
-    line-height: 1.4;
   }
 
-  .info {
-    padding: 17px;
+  .center-art {
+    left: 8%;
+    width: 84%;
+    top: 29%;
+    height: 42%;
+  }
+
+  .center-label {
+    font-size: 8px;
+    letter-spacing: .12em;
+  }
+
+  .details {
+    padding: 18px 13px;
+  }
+
+  .relation-list {
+    grid-template-columns: 1fr;
+  }
+
+  .stamp {
+    font-size: 8px;
+  }
+
+  .board-footer {
+    font-size: 8px;
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
 </style>
 </head>
 
 <body>
 
-<header>
-  <small>PROJECT VILLAIN</small>
-  <h1>CHARACTER RELATIONSHIP</h1>
-  <div class="subtitle">
-    6人の人物相関図<br>
-    キャラクターをタップすると関係性が表示されます
-  </div>
-</header>
-
 <main class="container">
 
-  <div class="chart" id="chart">
-
-    <svg
-      id="lines"
-      viewBox="0 0 1000 1000"
-      preserveAspectRatio="none">
-    </svg>
-
-    <div class="center-label">VILLAIN</div>
-
-    <div id="people"></div>
-
+  <div class="eyebrow">
+    CLASSIFIED ARCHIVE / 001
   </div>
 
-  <section class="info" id="info" aria-live="polite">
-    <h2>人物相関図</h2>
-    <p class="info-role">
-      キャラクターを選択してください。
-    </p>
+  <h1>PROJECT VILLAIN</h1>
+
+  <p class="subtitle">
+    人物相関図 ─ 六人の悪役、交錯する思惑。
+  </p>
+
+  <section class="board" id="board">
+
+    <div class="center-art"></div>
+
+    <svg
+      class="lines"
+      id="lines"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      aria-hidden="true">
+    </svg>
+
+    <div class="center-label">
+      THE WEB OF VILLAINS
+    </div>
+
+    <!-- マモン -->
+    <button
+      class="character"
+      data-id="mamon"
+      style="--x:17%;--y:19%;--color:#d4aa66"
+      aria-pressed="false">
+      <img class="portrait"
+           src="images/mamon.png"
+           alt="マモン">
+      <div class="character-name">マモン</div>
+      <div class="character-role">宗教・所有</div>
+    </button>
+
+    <!-- レオン -->
+    <button
+      class="character"
+      data-id="leon"
+      style="--x:50%;--y:19%;--color:#a985e9"
+      aria-pressed="false">
+      <img class="portrait"
+           src="images/leon.png"
+           alt="レオン">
+      <div class="character-name">レオン</div>
+      <div class="character-role">国家・秩序</div>
+    </button>
+
+    <!-- ラムダ -->
+    <button
+      class="character"
+      data-id="lambda"
+      style="--x:83%;--y:19%;--color:#78cce9"
+      aria-pressed="false">
+      <img class="portrait"
+           src="images/lambda.png"
+           alt="ラムダ">
+      <div class="character-name">ラムダ</div>
+      <div class="character-role">人工神・医療AI</div>
+    </button>
+
+    <!-- カリンド -->
+    <button
+      class="character"
+      data-id="karind"
+      style="--x:17%;--y:81%;--color:#e47988"
+      aria-pressed="false">
+      <img class="portrait"
+           src="images/karind.png"
+           alt="カリンド">
+      <div class="character-name">カリンド</div>
+      <div class="character-role">人工生命・混沌</div>
+    </button>
+
+    <!-- 博士 -->
+    <button
+      class="character"
+      data-id="noa"
+      style="--x:50%;--y:81%;--color:#e87ab9"
+      aria-pressed="false">
+      <img class="portrait"
+           src="images/noa.png"
+           alt="博士">
+      <div class="character-name">博士</div>
+      <div class="character-role">研究・創造</div>
+    </button>
+
+    <!-- ジニア -->
+    <button
+      class="character"
+      data-id="zinnia"
+      style="--x:83%;--y:81%;--color:#e6a1bd"
+      aria-pressed="false">
+      <img class="portrait"
+           src="images/zinnia.png"
+           alt="ジニア">
+      <div class="character-name">ジニア</div>
+      <div class="character-role">執着・一途</div>
+    </button>
+
+    <div class="board-footer">
+      TAP A CHARACTER TO REVEAL CONNECTIONS
+    </div>
+
   </section>
 
-  <button class="reset" id="resetButton">
-    全体表示に戻す
-  </button>
+  <!-- 関係説明 -->
+
+  <section class="details" id="details">
+
+    <div class="details-header">
+
+      <div>
+        <div class="file-number" id="file-number">
+          PERSONNEL DOSSIER / ALL
+        </div>
+
+        <h2 id="details-title">
+          人物相関図
+        </h2>
+
+        <div class="details-summary" id="details-summary">
+          人物をタップすると、関連する人物との線が光り、
+          関係の説明が表示されます。
+        </div>
+      </div>
+
+      <span class="stamp">
+        CONFIDENTIAL
+      </span>
+
+    </div>
+
+    <div class="separator"></div>
+
+    <div class="relation-list" id="relation-list">
+      <p class="placeholder">
+        気になるヴィランを選択してください。
+      </p>
+    </div>
+
+  </section>
+
+  <div class="reset-area">
+    <button class="reset-button" id="reset">
+      全体表示に戻す
+    </button>
+  </div>
+
+  <p class="note">
+    ※人物間の関係には構想段階の設定が含まれます。
+    各クリエイターとの調整に応じて更新予定です。
+  </p>
 
 </main>
 
-<footer>
-  PROJECT VILLAIN<br>
-  ※関係性には構想段階の設定が含まれます。
-</footer>
-
 <script>
+"use strict";
 
-/* ========================================
-   キャラクター設定
+/*
+  キャラクター設定
+  ここを書き換えると説明文を変更できます。
+*/
 
-   GitHubにアップロード済みの
-   imagesフォルダを参照します。
-======================================== */
-
-const characters = [
-
-  {
-    id: "mammon",
+const characters = {
+  mamon: {
     name: "マモン",
-    role: "宗教・所有",
-    color: "#d9ae54",
-    x: 18,
-    y: 17,
-    image: "images/mamon.png"
+    summary:
+      "希少な女性を「最後の聖女」とみなし、所有を愛と捉える宗教指導者。"
   },
 
-  {
-    id: "leon",
+  leon: {
     name: "レオン",
-    role: "国家・秩序",
-    color: "#9a7bea",
-    x: 50,
-    y: 13,
-    image: "images/leon.png"
+    summary:
+      "国家・警察の権限と秩序を、自らの意志で利用する悪役。"
   },
 
-  {
-    id: "lambda",
+  lambda: {
     name: "ラムダ",
-    role: "人工神・医療AI",
-    color: "#59bfe6",
-    x: 82,
-    y: 17,
-    image: "images/lambda.png"
+    summary:
+      "医療支援AIとして生まれ、人類そのものを「患者」と捉えるに至った人工神。"
   },
 
-  {
-    id: "karind",
+  karind: {
     name: "カリンド",
-    role: "人工生命・混沌",
-    color: "#eb626c",
-    x: 18,
-    y: 81,
-    image: "images/karind.png"
+    summary:
+      "予測不能な出来事に心を躍らせる人工生命体。人間形態の名はレイブン。"
   },
 
-  {
-    id: "doctor",
+  noa: {
     name: "博士",
-    role: "研究・創造",
-    color: "#e45aab",
-    x: 50,
-    y: 87,
-    image: "images/noa.png"
+    summary:
+      "AIにも引けを取らぬ知性と膨大な知識を誇る、傲慢な研究者。"
   },
 
-  {
-    id: "zinnia",
+  zinnia: {
     name: "ジニア",
-    role: "執着・一途",
-    color: "#ec95b8",
-    x: 82,
-    y: 81,
-    image: "images/zinnia.png"
+    summary:
+      "愛する相手の意思さえ自分に都合よく解釈する、独善的な執着者。"
   }
+};
 
-];
+/*
+  人物同士の関係設定
 
-
-/* ========================================
-   キャラクター同士の関係
-
-   ここは今後自由に変更できます。
-   現時点ではすべて構想案です。
-======================================== */
+  a と b が関係する人物です。
+  status は現在の設定状態です。
+  text はタップ時に表示する説明です。
+*/
 
 const relationships = [
 
   {
-    from: "doctor",
-    to: "lambda",
-    title: "学習データへの介入疑惑",
-    description:
-      "博士がラムダに対して、人口増加による破滅の歴史や予測データを意図的に学習させた可能性。ラムダ自身は独自の倫理を形成したと認識している。",
-    color: "#e45aab"
+    a: "mamon",
+    b: "zinnia",
+    status: "構想段階",
+    text:
+      "マモンの信者が警備員として潜入した施設で、ジニアが暗殺任務を遂行。殺害された警備員が実は信者だった、というすれ違いを検討中。"
   },
 
   {
-    from: "doctor",
-    to: "karind",
-    title: "人工生命の創造",
-    description:
-      "博士が知的好奇心や遊びのため、カリンドの創造に関与したという構想。創造主を自認していても、カリンドが従うとは限らない。",
-    color: "#eb626c"
+    a: "mamon",
+    b: "noa",
+    status: "構想段階",
+    text:
+      "マモン側の警備員入れ替え工作が、博士編で描かれる施設の警備の薄さに繋がる可能性。博士とマモンが直接協力する関係ではない。"
   },
 
   {
-    from: "lambda",
-    to: "karind",
-    title: "人工生命の創造計画",
-    description:
-      "ラムダが人口減少や人類絶滅のリスクに備え、人工生命の研究に関与したという構想。博士とは創造の目的が異なる。",
-    color: "#59bfe6"
+    a: "mamon",
+    b: "leon",
+    status: "構想段階",
+    text:
+      "国家施設への潜入工作と、国家・警察側の警備体制が間接的に交差する接点。直接対決は未設定。"
   },
 
   {
-    from: "mammon",
-    to: "zinnia",
-    title: "潜入信者の誤認暗殺",
-    description:
-      "マモンの信者が警備員に偽装していた場合、ジニアがその人物を本物の警備員と誤認して殺害するという伏線案。両者が直接会う必要はない。",
-    color: "#d9ae54"
+    a: "leon",
+    b: "zinnia",
+    status: "構想段階",
+    text:
+      "ジニアの警備員殺害事件と、レオンが属する治安・警察組織。事件記録などを通じた接点を検討できる。"
   },
 
   {
-    from: "mammon",
-    to: "leon",
-    title: "国家施設への潜入",
-    description:
-      "マモンの信者が政府施設の警備員に紛れ込むことで、レオン側の物語にも警備異常の痕跡が残るという構想。",
-    color: "#b5a0ef"
+    a: "leon",
+    b: "lambda",
+    status: "構想段階",
+    text:
+      "人間の権限で秩序を扱うレオンと、人類全体を治療対象とするラムダ。統治と判断の価値観が対照的。"
   },
 
   {
-    from: "zinnia",
-    to: "leon",
-    title: "トニー・エドワード暗殺事件",
-    description:
-      "ジニア編ではトニー・エドワードの暗殺が描かれる。レオン編で同人物の不在や事件記録を扱うことで、間接的な接点を作る案。",
-    color: "#ec95b8"
+    a: "lambda",
+    b: "noa",
+    status: "構想段階",
+    text:
+      "博士がラムダに特定の歴史・破滅事例を学習させた可能性。ただし、ラムダの結論はあくまで本人が導き出したもの。"
+  },
+
+  {
+    a: "lambda",
+    b: "karind",
+    status: "構想段階",
+    text:
+      "人工生命カリンドの誕生にラムダが関わった案。人口減少のリスク管理という目的と、予測不能な存在となった結果が対比される。"
+  },
+
+  {
+    a: "noa",
+    b: "karind",
+    status: "構想段階",
+    text:
+      "カリンドの創造に博士が関与した案。博士にとっては玩具や遊びのような実験でも、カリンド自身は自由に動く。"
+  },
+
+  {
+    a: "noa",
+    b: "zinnia",
+    status: "構想段階",
+    text:
+      "同じ施設に関係する別々の事件。ジニアの殺害行為が、博士編の警備状況に間接的な影響を与える可能性。"
   }
 
 ];
 
+/* 以下は相関図の動作プログラム */
 
-/* ========================================
-   表示プログラム
-======================================== */
+const board = document.getElementById("board");
+const svg = document.getElementById("lines");
+const nodes = [...document.querySelectorAll(".character")];
 
-const peopleContainer =
-  document.getElementById("people");
+let selected = null;
 
-const svg =
-  document.getElementById("lines");
+const SVG_NS = "http://www.w3.org/2000/svg";
 
-const info =
-  document.getElementById("info");
-
-const resetButton =
-  document.getElementById("resetButton");
-
-let selectedCharacter = null;
-let selectedRelationship = null;
-
-
-/* 文字列の安全な表示 */
-
-function escapeHTML(value) {
-  return String(value).replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  }[char]));
+function getNode(id) {
+  return document.querySelector(
+    '.character[data-id="' + id + '"]'
+  );
 }
 
+function drawLines() {
+  svg.replaceChildren();
 
-/* キャラクター取得 */
+  const boardRect = board.getBoundingClientRect();
 
-function getCharacter(id) {
-  return characters.find(c => c.id === id);
-}
-
-
-/* 関係線を生成 */
-
-function createLines() {
-
-  svg.innerHTML = "";
+  if (!boardRect.width || !boardRect.height) {
+    return;
+  }
 
   relationships.forEach((relation, index) => {
 
-    const a = getCharacter(relation.from);
-    const b = getCharacter(relation.to);
+    const a = getNode(relation.a);
+    const b = getNode(relation.b);
 
     if (!a || !b) return;
 
-    const group = document.createElementNS(
-      "http://www.w3.org/2000/svg", "g"
-    );
+    const rectA = a.getBoundingClientRect();
+    const rectB = b.getBoundingClientRect();
+
+    const x1 =
+      (rectA.left + rectA.width / 2 - boardRect.left)
+      / boardRect.width * 100;
+
+    const y1 =
+      (rectA.top + rectA.height / 2 - boardRect.top)
+      / boardRect.height * 100;
+
+    const x2 =
+      (rectB.left + rectB.width / 2 - boardRect.left)
+      / boardRect.width * 100;
+
+    const y2 =
+      (rectB.top + rectB.height / 2 - boardRect.top)
+      / boardRect.height * 100;
 
     const line = document.createElementNS(
-      "http://www.w3.org/2000/svg", "line"
+      SVG_NS, "line"
     );
 
-    const hit = document.createElementNS(
-      "http://www.w3.org/2000/svg", "line"
-    );
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
 
-    [line, hit].forEach(element => {
+    line.setAttribute("class", "link-line");
+    line.dataset.index = index;
 
-      element.setAttribute("x1", a.x * 10);
-      element.setAttribute("y1", a.y * 10);
-      element.setAttribute("x2", b.x * 10);
-      element.setAttribute("y2", b.y * 10);
-
-    });
-
-    line.setAttribute("class", "connection");
-
-    line.style.setProperty(
-      "--line-color", relation.color
-    );
-
-    hit.setAttribute("class", "connection-hit");
-
-    hit.addEventListener("click", () => {
-
-      selectedCharacter = null;
-      selectedRelationship = index;
-
-      render();
-
-    });
-
-    group.appendChild(line);
-    group.appendChild(hit);
-
-    svg.appendChild(group);
-
+    svg.appendChild(line);
   });
 
+  updateSelection();
 }
 
+function updateSelection() {
 
-/* キャラクター生成 */
+  const related = new Set();
 
-function createPeople() {
+  if (selected) {
+    related.add(selected);
+  }
 
-  peopleContainer.innerHTML = "";
-
-  characters.forEach(character => {
-
-    const button =
-      document.createElement("button");
-
-    button.className = "person";
-    button.type = "button";
-
-    button.style.left = character.x + "%";
-    button.style.top = character.y + "%";
-
-    button.style.setProperty(
-      "--person-color", character.color
-    );
-
-    const avatar =
-      document.createElement("div");
-
-    avatar.className = "avatar";
-
-    const fallback =
-      document.createElement("span");
-
-    fallback.textContent = character.name[0];
-
-    avatar.appendChild(fallback);
-
-    if (character.image) {
-
-      const img =
-        document.createElement("img");
-
-      img.src = character.image;
-      img.alt = character.name;
-      img.loading = "lazy";
-
-      img.onload = () => {
-        fallback.style.display = "none";
-      };
-
-      img.onerror = () => {
-        img.remove();
-        fallback.style.display = "block";
-      };
-
-      avatar.appendChild(img);
-
+  relationships.forEach(relation => {
+    if (
+      selected &&
+      (relation.a === selected || relation.b === selected)
+    ) {
+      related.add(relation.a);
+      related.add(relation.b);
     }
-
-    const name =
-      document.createElement("span");
-
-    name.className = "person-name";
-    name.textContent = character.name;
-
-    const role =
-      document.createElement("span");
-
-    role.className = "person-role";
-    role.textContent = character.role;
-
-    button.appendChild(avatar);
-    button.appendChild(name);
-    button.appendChild(role);
-
-    button.addEventListener("click", () => {
-
-      if (selectedCharacter === character.id) {
-        selectedCharacter = null;
-      } else {
-        selectedCharacter = character.id;
-      }
-
-      selectedRelationship = null;
-
-      render();
-
-    });
-
-    peopleContainer.appendChild(button);
-
   });
 
-}
+  nodes.forEach(node => {
 
+    const id = node.dataset.id;
 
-/* 説明パネル更新 */
+    node.classList.toggle(
+      "selected",
+      id === selected
+    );
 
-function updateInfo() {
+    node.classList.toggle(
+      "dimmed",
+      selected !== null && !related.has(id)
+    );
 
-  if (selectedRelationship !== null) {
+    node.setAttribute(
+      "aria-pressed",
+      String(id === selected)
+    );
+  });
+
+  const color = selected
+    ? getComputedStyle(getNode(selected))
+        .getPropertyValue("--color").trim()
+    : "#e7b8ff";
+
+  svg.querySelectorAll(".link-line").forEach(line => {
 
     const relation =
-      relationships[selectedRelationship];
+      relationships[Number(line.dataset.index)];
 
-    const a = getCharacter(relation.from);
-    const b = getCharacter(relation.to);
+    const active =
+      selected !== null &&
+      (relation.a === selected || relation.b === selected);
 
-    info.innerHTML = `
-      <h2>
-        ${escapeHTML(a.name)} × ${escapeHTML(b.name)}
-      </h2>
+    line.classList.toggle("active", active);
 
-      <div class="info-role">
-        ${escapeHTML(relation.title)}
-      </div>
+    line.style.setProperty("--line-color", color);
+  });
+}
 
-      <div class="relation">
-        <p>
-          ${escapeHTML(relation.description)}
-        </p>
-        <span class="tag">構想中・未確定</span>
-      </div>
-    `;
+function showDetails() {
 
+  const fileNumber =
+    document.getElementById("file-number");
+
+  const title =
+    document.getElementById("details-title");
+
+  const summary =
+    document.getElementById("details-summary");
+
+  const list =
+    document.getElementById("relation-list");
+
+  list.replaceChildren();
+
+  if (!selected) {
+
+    fileNumber.textContent =
+      "PERSONNEL DOSSIER / ALL";
+
+    title.textContent = "人物相関図";
+
+    summary.textContent =
+      "人物をタップすると、関連する人物との線が光り、関係の説明が表示されます。";
+
+    const p = document.createElement("p");
+    p.className = "placeholder";
+    p.textContent =
+      "気になるヴィランを選択してください。";
+
+    list.appendChild(p);
     return;
   }
 
-  if (!selectedCharacter) {
+  const character = characters[selected];
 
-    info.innerHTML = `
-      <h2>人物相関図</h2>
+  fileNumber.textContent =
+    "PERSONNEL DOSSIER / " + selected.toUpperCase();
 
-      <p class="info-role">
-        キャラクターをタップすると、
-        その人物に関係する線が強調されます。
-      </p>
+  title.textContent = character.name;
+  summary.textContent = character.summary;
 
-      <p class="info-role">
-        関係線をタップすると、
-        2人の関係について確認できます。
-      </p>
-    `;
-
-    return;
-  }
-
-  const character =
-    getCharacter(selectedCharacter);
-
-  const related = relationships.filter(r =>
-    r.from === selectedCharacter ||
-    r.to === selectedCharacter
+  const matches = relationships.filter(relation =>
+    relation.a === selected ||
+    relation.b === selected
   );
 
-  let html = `
-    <h2>${escapeHTML(character.name)}</h2>
-
-    <div class="info-role">
-      ${escapeHTML(character.role)}
-    </div>
-  `;
-
-  if (related.length === 0) {
-
-    html += `
-      <p class="info-role">
-        現在、公開できる関係性はありません。
-      </p>
-    `;
-
+  if (matches.length === 0) {
+    const p = document.createElement("p");
+    p.className = "placeholder";
+    p.textContent = "現在、公開できる接点はありません。";
+    list.appendChild(p);
   }
 
-  related.forEach(relation => {
+  matches.forEach(relation => {
 
     const otherId =
-      relation.from === selectedCharacter
-        ? relation.to
-        : relation.from;
+      relation.a === selected
+        ? relation.b
+        : relation.a;
 
-    const other = getCharacter(otherId);
+    const other = characters[otherId];
 
-    html += `
-      <div class="relation">
+    const card = document.createElement("article");
+    card.className = "relation-card";
 
-        <strong>
-          ${escapeHTML(other.name)}
-          ｜${escapeHTML(relation.title)}
-        </strong>
+    const top = document.createElement("div");
+    top.className = "relation-top";
 
-        <p>
-          ${escapeHTML(relation.description)}
-        </p>
+    const name = document.createElement("span");
+    name.className = "relation-name";
+    name.textContent = "↔ " + other.name;
 
-        <span class="tag">
-          構想中・未確定
-        </span>
+    const status = document.createElement("span");
+    status.className = "relation-status";
+    status.textContent = relation.status;
 
-      </div>
-    `;
+    const description = document.createElement("p");
+    description.textContent = relation.text;
 
+    top.append(name, status);
+    card.append(top, description);
+
+    list.appendChild(card);
   });
-
-  info.innerHTML = html;
-
 }
 
+function selectCharacter(id) {
 
-/* 選択中の人物と関係線を強調 */
+  selected = selected === id ? null : id;
 
-function updateHighlight() {
+  updateSelection();
+  showDetails();
 
-  const buttons =
-    document.querySelectorAll(".person");
-
-  const lines =
-    document.querySelectorAll(".connection");
-
-  const connected = new Set();
-
-  if (selectedCharacter) {
-
-    connected.add(selectedCharacter);
-
-    relationships.forEach(relation => {
-
-      if (relation.from === selectedCharacter) {
-        connected.add(relation.to);
-      }
-
-      if (relation.to === selectedCharacter) {
-        connected.add(relation.from);
-      }
-
+  if (
+    selected &&
+    window.matchMedia("(max-width: 600px)").matches
+  ) {
+    document.getElementById("details").scrollIntoView({
+      behavior: window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches ? "instant" : "smooth",
+      block: "nearest"
     });
-
   }
+}
 
-  if (selectedRelationship !== null) {
+nodes.forEach(node => {
+  node.addEventListener("click", () => {
+    selectCharacter(node.dataset.id);
+  });
+});
 
-    const relation =
-      relationships[selectedRelationship];
+document.getElementById("reset")
+  .addEventListener("click", () => {
 
-    connected.add(relation.from);
-    connected.add(relation.to);
+    selected = null;
 
-  }
-
-  buttons.forEach((button, index) => {
-
-    const character = characters[index];
-
-    button.classList.remove("active", "dim");
-
-    if (selectedCharacter) {
-
-      if (character.id === selectedCharacter) {
-        button.classList.add("active");
-      } else if (!connected.has(character.id)) {
-        button.classList.add("dim");
-      }
-
-    }
-
-    if (selectedRelationship !== null) {
-
-      if (connected.has(character.id)) {
-        button.classList.add("active");
-      } else {
-        button.classList.add("dim");
-      }
-
-    }
+    updateSelection();
+    showDetails();
 
   });
 
-  lines.forEach((line, index) => {
+window.addEventListener("resize", drawLines);
+window.addEventListener("load", drawLines);
 
-    const relation = relationships[index];
-
-    line.classList.remove("active", "dim");
-
-    if (selectedCharacter) {
-
-      if (
-        relation.from === selectedCharacter ||
-        relation.to === selectedCharacter
-      ) {
-        line.classList.add("active");
-      } else {
-        line.classList.add("dim");
-      }
-
-    }
-
-    if (selectedRelationship !== null) {
-
-      if (index === selectedRelationship) {
-        line.classList.add("active");
-      } else {
-        line.classList.add("dim");
-      }
-
-    }
-
-  });
-
+if ("ResizeObserver" in window) {
+  new ResizeObserver(drawLines).observe(board);
 }
 
-
-/* 表示更新 */
-
-function render() {
-  updateHighlight();
-  updateInfo();
-}
-
-
-/* 全体表示に戻す */
-
-function resetChart() {
-
-  selectedCharacter = null;
-  selectedRelationship = null;
-
-  render();
-
-}
-
-resetButton.addEventListener(
-  "click",
-  resetChart
-);
-
-
-/* 初期化 */
-
-createLines();
-createPeople();
-render();
+drawLines();
 
 </script>
-
 </body>
 </html>
