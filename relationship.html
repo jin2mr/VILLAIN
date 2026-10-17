@@ -1,535 +1,563 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#08060d">
-<title>PROJECT VILLAIN | 人物相関図</title>
+<title>PROJECT VILLAIN | 人物相関図・悪役相性診断</title>
 
 <style>
-:root {
-  --bg: #08060d;
-  --panel: #17101e;
-  --text: #f5edf6;
-  --muted: #b7a8bd;
-  --border: rgba(208,166,217,.28);
+:root{
+  --bg:#08060d;
+  --panel:#17101e;
+  --text:#f5edf6;
+  --muted:#b7a8bd;
+  --border:rgba(208,166,217,.28);
 }
-
-* {
-  box-sizing: border-box;
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:radial-gradient(ellipse at 50% 0%,#26132c 0%,#08060d 48%);
+  color:var(--text);
+  font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+  overflow-x:hidden;
 }
-
-html {
-  scroll-behavior: smooth;
+button{font:inherit}
+button:focus-visible{
+  outline:2px solid #fff;
+  outline-offset:3px;
 }
-
-body {
-  margin: 0;
-  background:
-    radial-gradient(
-      ellipse at 50% 0%,
-      #26132c 0%,
-      #08060d 48%
-    );
-  color: var(--text);
-  font-family:
-    "Noto Sans JP",
-    "Hiragino Kaku Gothic ProN",
-    "Yu Gothic",
-    sans-serif;
-  overflow-x: hidden;
-}
-
-button {
-  font: inherit;
-}
-
-.page {
-  width: min(100%, 980px);
-  margin: auto;
-  padding: 42px 14px 90px;
+[hidden]{display:none!important}
+.page{
+  width:min(100%,980px);
+  margin:auto;
+  padding:42px 14px 90px;
 }
 
 /* HEADER */
-
-header {
-  text-align: center;
-  margin-bottom: 44px;
+header{text-align:center;margin-bottom:44px}
+.archive{
+  font-size:11px;
+  letter-spacing:.32em;
+  color:#b4a0bd;
+  margin-bottom:13px;
 }
-
-.archive {
-  font-size: 11px;
-  letter-spacing: .32em;
-  color: #b4a0bd;
-  margin-bottom: 13px;
+header h1{
+  margin:0;
+  font-family:Georgia,serif;
+  font-size:clamp(27px,7vw,49px);
+  letter-spacing:.12em;
+  line-height:1.25;
+  text-shadow:0 0 28px rgba(194,104,205,.2);
 }
-
-header h1 {
-  margin: 0;
-  font-family: Georgia, serif;
-  font-size: clamp(27px, 7vw, 49px);
-  letter-spacing: .12em;
-  line-height: 1.25;
-  text-shadow: 0 0 28px rgba(194,104,205,.2);
-}
-
-.subtitle {
-  margin-top: 20px;
-  color: #bfb1c4;
-  font-size: clamp(12px, 3.3vw, 16px);
-  letter-spacing: .04em;
+.subtitle{
+  margin-top:20px;
+  color:#bfb1c4;
+  font-size:clamp(12px,3.3vw,16px);
 }
 
 /* RELATIONSHIP BOARD */
-
-.relationship-board {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 0.68;
-  min-height: 540px;
-  max-height: 1150px;
-  border: 1px solid rgba(210,165,220,.34);
-  border-radius: 34px;
-  overflow: hidden;
-  isolation: isolate;
-  background: #09060e;
-  box-shadow:
-    0 20px 70px rgba(0,0,0,.45),
-    0 0 40px rgba(143,64,158,.08);
+.relationship-board{
+  position:relative;
+  width:100%;
+  aspect-ratio:.68;
+  min-height:540px;
+  max-height:1150px;
+  border:1px solid rgba(210,165,220,.34);
+  border-radius:34px;
+  overflow:hidden;
+  isolation:isolate;
+  background:#09060e;
+  box-shadow:0 20px 70px rgba(0,0,0,.45),0 0 40px rgba(143,64,158,.08);
 }
-
-/* 背景画像を枠いっぱいに表示 */
-
-.board-background {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
+.board-background{
+  position:absolute;
+  inset:0;
+  z-index:0;
   background-image:
-    linear-gradient(
-      to bottom,
-      rgba(8,5,13,.25),
-      rgba(8,5,13,.08) 45%,
-      rgba(8,5,13,.3)
-    ),
+    linear-gradient(to bottom,rgba(8,5,13,.25),rgba(8,5,13,.08) 45%,rgba(8,5,13,.3)),
     url("images/relationship-bg.png");
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
+  background-position:center;
+  background-size:cover;
+  background-repeat:no-repeat;
 }
-
-/* 背景の控えめな暗さ */
-
-.board-background::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(
-      ellipse at center,
-      transparent 24%,
-      rgba(6,4,10,.22) 100%
-    );
+.board-background::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(ellipse at center,transparent 24%,rgba(6,4,10,.22) 100%);
 }
-
-/* 線を描画するSVG */
-
-.connection-layer {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  pointer-events: none;
-  overflow: visible;
+.connection-layer{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:2;
+  pointer-events:none;
+  overflow:visible;
 }
-
-.connection {
-  fill: none;
-  stroke: #c6accd;
-  stroke-width: 1.2;
-  stroke-dasharray: 5 8;
-  opacity: .23;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-  transition:
-    opacity .35s ease,
-    stroke .35s ease,
-    filter .35s ease;
+.connection{
+  fill:none;
+  stroke:#c6accd;
+  stroke-width:1.2;
+  stroke-dasharray:5 8;
+  opacity:.23;
+  stroke-linecap:round;
+  vector-effect:non-scaling-stroke;
+  transition:opacity .35s,stroke .35s,filter .35s;
 }
-
-.connection.hidden {
-  opacity: 0;
+.connection.hidden{opacity:0}
+.connection.active{
+  stroke-dasharray:none;
+  stroke-width:2;
+  opacity:1;
+  filter:drop-shadow(0 0 5px currentColor);
 }
-
-.connection.active {
-  stroke-dasharray: none;
-  stroke-width: 2;
-  opacity: 1;
-  filter: drop-shadow(0 0 5px currentColor);
+.connection.drawing{
+  animation:drawLine .7s ease-out forwards;
 }
-
-/* 線が伸びるアニメーション */
-
-.connection.drawing {
-  animation: drawLine .7s ease-out forwards;
-}
-
-@keyframes drawLine {
-  from {
-    stroke-dasharray: var(--line-length);
-    stroke-dashoffset: var(--line-length);
+@keyframes drawLine{
+  from{
+    stroke-dasharray:var(--line-length);
+    stroke-dashoffset:var(--line-length);
   }
-  to {
-    stroke-dasharray: var(--line-length);
-    stroke-dashoffset: 0;
+  to{
+    stroke-dasharray:var(--line-length);
+    stroke-dashoffset:0;
   }
 }
 
-/* キャラクターカード */
-
-.character {
-  --accent: #bd8aca;
-
-  position: absolute;
-  z-index: 3;
-  width: 29.5%;
-  padding: 8px 8px 15px;
-  border-radius: 20px;
-  border: 1.5px solid var(--accent);
-  background: rgba(21,14,29,.94);
-  box-shadow:
-    0 7px 24px rgba(0,0,0,.55),
-    inset 0 0 14px rgba(255,255,255,.025);
-  color: white;
-  cursor: pointer;
-  text-align: center;
-  transform: translate(-50%, -50%);
-  transition:
-    opacity .35s ease,
-    border-color .35s ease,
-    box-shadow .35s ease,
-    transform .35s ease,
-    filter .35s ease;
-  -webkit-tap-highlight-color: transparent;
+/* CHARACTER CARDS */
+.character{
+  --accent:#bd8aca;
+  position:absolute;
+  z-index:3;
+  width:29.5%;
+  padding:8px 8px 15px;
+  border-radius:20px;
+  border:1.5px solid var(--accent);
+  background:rgba(21,14,29,.94);
+  box-shadow:0 7px 24px rgba(0,0,0,.55),inset 0 0 14px rgba(255,255,255,.025);
+  color:white;
+  cursor:pointer;
+  text-align:center;
+  transform:translate(-50%,-50%);
+  transition:opacity .35s,border-color .35s,box-shadow .35s,transform .35s,filter .35s;
+  -webkit-tap-highlight-color:transparent;
+}
+.character:active{
+  transform:translate(-50%,-50%) scale(.97);
+}
+.character img{
+  display:block;
+  width:100%;
+  aspect-ratio:1;
+  object-fit:cover;
+  border-radius:12px;
+  border:1px solid var(--accent);
+  background:#130d19;
+}
+.character-name{
+  display:block;
+  margin-top:11px;
+  font-size:clamp(14px,3.8vw,22px);
+  font-weight:800;
+  letter-spacing:.04em;
+}
+.character-role{
+  display:block;
+  margin-top:7px;
+  font-size:clamp(10px,2.6vw,14px);
+  color:#bfb2c4;
+  white-space:nowrap;
 }
 
-.character:active {
-  transform: translate(-50%, -50%) scale(.97);
+/* CARD POSITIONS */
+#mamon{left:17.5%;top:19%;--accent:#cda65e}
+#leon{left:50%;top:19%;--accent:#a578e6}
+#lambda{left:82.5%;top:19%;--accent:#64cbe6}
+#karind{left:17.5%;top:81%;--accent:#df6687}
+#noa{left:50%;top:81%;--accent:#ef7bb8}
+#zinnia{left:82.5%;top:81%;--accent:#e99fbd}
+
+.character.dimmed{
+  opacity:.34;
+  filter:grayscale(.4);
 }
-
-.character:focus-visible {
-  outline: 2px solid white;
-  outline-offset: 4px;
-}
-
-.character img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  border-radius: 12px;
-  border: 1px solid var(--accent);
-  background: #130d19;
-}
-
-.character-name {
-  display: block;
-  margin-top: 11px;
-  font-size: clamp(14px, 3.8vw, 22px);
-  font-weight: 800;
-  letter-spacing: .04em;
-}
-
-.character-role {
-  display: block;
-  margin-top: 7px;
-  font-size: clamp(10px, 2.6vw, 14px);
-  color: #bfb2c4;
-  white-space: nowrap;
-}
-
-/* 配置 */
-
-#mamon {
-  left: 17.5%;
-  top: 19%;
-  --accent: #cda65e;
-}
-
-#leon {
-  left: 50%;
-  top: 19%;
-  --accent: #a578e6;
-}
-
-#lambda {
-  left: 82.5%;
-  top: 19%;
-  --accent: #64cbe6;
-}
-
-#karind {
-  left: 17.5%;
-  top: 81%;
-  --accent: #df6687;
-}
-
-#noa {
-  left: 50%;
-  top: 81%;
-  --accent: #ef7bb8;
-}
-
-#zinnia {
-  left: 82.5%;
-  top: 81%;
-  --accent: #e99fbd;
-}
-
-/* 選択状態 */
-
-.character.dimmed {
-  opacity: .34;
-  filter: grayscale(.4);
-}
-
-.character.selected {
-  opacity: 1;
-  z-index: 5;
-  border-width: 2px;
+.character.selected{
+  opacity:1;
+  z-index:5;
+  border-width:2px;
   box-shadow:
     0 0 13px var(--accent),
-    0 0 30px color-mix(
-      in srgb,
-      var(--accent) 30%,
-      transparent
-    ),
+    0 0 30px color-mix(in srgb,var(--accent) 30%,transparent),
     0 8px 25px rgba(0,0,0,.6);
 }
-
-.character.connected {
-  opacity: 1;
-  filter: none;
-  animation: connectedFlash .85s ease-out forwards;
+.character.connected{
+  opacity:1;
+  filter:none;
+  animation:connectedFlash .85s ease-out forwards;
 }
-
-@keyframes connectedFlash {
-  0% {
-    box-shadow:
-      0 0 0 transparent;
-  }
-
-  30% {
+@keyframes connectedFlash{
+  0%{box-shadow:0 0 0 transparent}
+  30%{
     box-shadow:
       0 0 20px var(--accent),
       0 0 40px var(--accent),
       inset 0 0 14px rgba(255,255,255,.12);
   }
-
-  100% {
+  100%{
     box-shadow:
-      0 0 10px color-mix(
-        in srgb,
-        var(--accent) 55%,
-        transparent
-      ),
-      0 0 22px color-mix(
-        in srgb,
-        var(--accent) 18%,
-        transparent
-      );
+      0 0 10px color-mix(in srgb,var(--accent) 55%,transparent),
+      0 0 22px color-mix(in srgb,var(--accent) 18%,transparent);
   }
 }
-
-/* 案内文 */
-
-.board-hint {
-  position: absolute;
-  bottom: 12px;
-  left: 0;
-  right: 0;
-  z-index: 4;
-  text-align: center;
-  font-size: clamp(8px, 2vw, 11px);
-  letter-spacing: .1em;
-  color: rgba(255,255,255,.6);
-  pointer-events: none;
+.board-hint{
+  position:absolute;
+  bottom:12px;
+  left:0;
+  right:0;
+  z-index:4;
+  text-align:center;
+  font-size:clamp(8px,2vw,11px);
+  letter-spacing:.1em;
+  color:rgba(255,255,255,.6);
+  pointer-events:none;
 }
 
 /* DOSSIER */
+.dossier{
+  margin-top:40px;
+  padding:30px 24px;
+  border:1px solid var(--border);
+  border-radius:32px;
+  background:linear-gradient(145deg,rgba(39,23,45,.95),rgba(13,10,19,.98));
+  box-shadow:0 18px 45px rgba(0,0,0,.25);
+}
+.dossier-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.dossier-label{
+  font-size:12px;
+  letter-spacing:.19em;
+  line-height:1.7;
+  color:#b5a2bd;
+}
+.confidential{
+  border:1px solid #80688a;
+  padding:11px;
+  font-size:10px;
+  color:#d0bcd5;
+  white-space:nowrap;
+}
+.dossier h2{
+  margin:22px 0 12px;
+  font-size:clamp(25px,6vw,36px);
+}
+.dossier-description{
+  color:#cbbfd0;
+  font-size:14px;
+  line-height:1.9;
+}
+.relationship-list{
+  display:grid;
+  gap:12px;
+  margin-top:26px;
+}
+.relationship-item{
+  padding:17px;
+  border-radius:15px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(220,190,225,.14);
+}
+.relationship-item strong{
+  display:block;
+  font-size:15px;
+  margin-bottom:7px;
+}
+.relationship-item p{
+  margin:0;
+  color:#c6b8cb;
+  font-size:13px;
+  line-height:1.85;
+}
+.relationship-status{
+  display:inline-block;
+  margin-bottom:9px;
+  font-size:10px;
+  letter-spacing:.12em;
+  color:#d0a7d8;
+}
+.reset-button{
+  display:block;
+  width:100%;
+  margin-top:24px;
+  padding:14px;
+  background:transparent;
+  border:1px solid rgba(220,190,225,.35);
+  border-radius:12px;
+  color:#e9dceb;
+  cursor:pointer;
+}
+.reset-button:hover{
+  background:rgba(255,255,255,.06);
+}
 
-.dossier {
-  margin-top: 40px;
-  padding: 30px 24px;
-  border: 1px solid var(--border);
-  border-radius: 32px;
+/* =====================================
+   VILLAIN MATCH
+===================================== */
+.match-section{
+  position:relative;
+  margin-top:65px;
+  padding:35px 25px;
+  border:1px solid rgba(218,151,205,.4);
+  border-radius:32px;
   background:
-    linear-gradient(
-      145deg,
-      rgba(39,23,45,.95),
-      rgba(13,10,19,.98)
-    );
-  box-shadow: 0 18px 45px rgba(0,0,0,.25);
+    radial-gradient(ellipse at 50% 0%,rgba(130,54,111,.18),transparent 65%),
+    linear-gradient(145deg,#29172e,#100b18 85%);
+  box-shadow:0 18px 48px rgba(0,0,0,.35);
+  text-align:center;
+  scroll-margin-top:20px;
+}
+.match-kicker{
+  font-size:11px;
+  letter-spacing:.2em;
+  line-height:1.8;
+  color:#d6a2d3;
+}
+.match-section h2{
+  margin:20px 0 12px;
+  font-size:clamp(25px,6vw,38px);
+}
+.match-intro{
+  color:#cbb9cf;
+  font-size:14px;
+  line-height:2;
+}
+.match-icon{
+  display:block;
+  margin:28px auto 12px;
+  font-size:52px;
+  color:#ed95bf;
+  text-shadow:0 0 30px rgba(237,149,191,.5);
+}
+.match-primary,
+.match-secondary{
+  display:block;
+  width:100%;
+  padding:16px;
+  margin-top:17px;
+  border-radius:13px;
+  cursor:pointer;
+  font-size:15px;
+  line-height:1.5;
+  transition:background .2s,transform .2s;
+}
+.match-primary{
+  color:white;
+  border:1px solid #e187b6;
+  background:linear-gradient(110deg,#8b315f,#b04a85);
+  box-shadow:0 8px 25px rgba(169,55,119,.18);
+}
+.match-secondary{
+  color:#ead6e9;
+  border:1px solid #765a7d;
+  background:rgba(255,255,255,.025);
+}
+.match-primary:active,
+.match-secondary:active{
+  transform:scale(.98);
+}
+.match-primary:hover{
+  background:linear-gradient(110deg,#a33a71,#c55a99);
+}
+.match-progress{
+  height:5px;
+  margin:22px 0 30px;
+  background:#35263c;
+  border-radius:10px;
+  overflow:hidden;
+}
+.match-progress-fill{
+  height:100%;
+  width:0;
+  background:linear-gradient(90deg,#a74883,#ee91be);
+  transition:width .3s;
+}
+.match-question{
+  font-size:clamp(19px,5vw,25px);
+  line-height:1.7;
+  margin:22px 0 28px;
+}
+.match-options{
+  display:grid;
+  gap:12px;
+  text-align:left;
+}
+.match-option{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  width:100%;
+  min-height:65px;
+  padding:15px;
+  color:#f1e5f1;
+  border:1px solid #634a6b;
+  border-radius:13px;
+  background:rgba(255,255,255,.035);
+  text-align:left;
+  cursor:pointer;
+  font-size:14px;
+  line-height:1.7;
+  transition:border-color .2s,background .2s;
+}
+.match-option:hover,
+.match-option:focus-visible,
+.match-option.chosen{
+  border-color:#e48ab9;
+  background:rgba(215,111,174,.13);
+}
+.match-option-letter{
+  flex:0 0 30px;
+  display:grid;
+  place-items:center;
+  height:30px;
+  border:1px solid #86618a;
+  border-radius:8px;
+  color:#e5add2;
+  font-family:Georgia,serif;
+}
+.match-counter{
+  font-size:12px;
+  color:#d4a6ce;
+  letter-spacing:.15em;
+}
+.match-result-image{
+  display:block;
+  width:min(100%,290px);
+  aspect-ratio:1;
+  object-fit:cover;
+  margin:25px auto;
+  border:2px solid #d17bb1;
+  border-radius:22px;
+  box-shadow:0 0 35px rgba(215,103,180,.25);
+}
+.match-result-name{
+  font-size:clamp(25px,6vw,35px);
+  font-weight:800;
+  margin:12px 0;
+}
+.match-result-catch{
+  color:#e6b2d4;
+  font-size:15px;
+  line-height:1.8;
+}
+.match-result-text{
+  padding:22px;
+  margin-top:24px;
+  border:1px solid rgba(215,169,216,.22);
+  border-radius:16px;
+  background:rgba(255,255,255,.04);
+  color:#e1d1e1;
+  font-size:14px;
+  line-height:2;
+  text-align:left;
+}
+.match-result-label{
+  color:#d49ac8;
+  font-size:11px;
+  letter-spacing:.2em;
+  margin-top:15px;
+}
+.match-share-preview{
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  padding:18px;
+  margin-top:20px;
+  border:1px solid rgba(215,169,216,.18);
+  border-radius:13px;
+  background:rgba(0,0,0,.18);
+  color:#d5c6d9;
+  font-size:12px;
+  line-height:1.8;
+  text-align:left;
+}
+.match-note{
+  margin-top:20px;
+  color:#9e8da5;
+  font-size:11px;
+  line-height:1.8;
+}
+.match-actions{
+  display:grid;
+  gap:2px;
+  margin-top:20px;
 }
 
-.dossier-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
+/* FOOTER */
+footer{
+  text-align:center;
+  padding-top:55px;
+  color:#74677b;
+  font-family:Georgia,serif;
+  font-size:11px;
+  letter-spacing:.2em;
 }
 
-.dossier-label {
-  font-size: 12px;
-  letter-spacing: .19em;
-  line-height: 1.7;
-  color: #b5a2bd;
-}
-
-.confidential {
-  border: 1px solid #80688a;
-  padding: 11px;
-  font-size: 10px;
-  color: #d0bcd5;
-  white-space: nowrap;
-}
-
-.dossier h2 {
-  margin: 22px 0 12px;
-  font-size: clamp(25px, 6vw, 36px);
-}
-
-.dossier-description {
-  color: #cbbfd0;
-  font-size: 14px;
-  line-height: 1.9;
-}
-
-.relationship-list {
-  display: grid;
-  gap: 12px;
-  margin-top: 26px;
-}
-
-.relationship-item {
-  padding: 17px;
-  border-radius: 15px;
-  background: rgba(255,255,255,.035);
-  border: 1px solid rgba(220,190,225,.14);
-}
-
-.relationship-item strong {
-  display: block;
-  font-size: 15px;
-  margin-bottom: 7px;
-}
-
-.relationship-item p {
-  margin: 0;
-  color: #c6b8cb;
-  font-size: 13px;
-  line-height: 1.85;
-}
-
-.relationship-status {
-  display: inline-block;
-  margin-bottom: 9px;
-  font-size: 10px;
-  letter-spacing: .12em;
-  color: #d0a7d8;
-}
-
-.reset-button {
-  display: block;
-  width: 100%;
-  margin-top: 24px;
-  padding: 14px;
-  background: transparent;
-  border: 1px solid rgba(220,190,225,.35);
-  border-radius: 12px;
-  color: #e9dceb;
-  cursor: pointer;
-  letter-spacing: .08em;
-}
-
-.reset-button:hover {
-  background: rgba(255,255,255,.06);
-}
-
-footer {
-  text-align: center;
-  padding-top: 40px;
-  color: #74677b;
-  font-family: Georgia, serif;
-  font-size: 11px;
-  letter-spacing: .2em;
-}
-
-/* スマホ */
-
-@media(max-width: 480px) {
-  .page {
-    padding-left: 12px;
-    padding-right: 12px;
+/* MOBILE */
+@media(max-width:480px){
+  .page{
+    padding-left:12px;
+    padding-right:12px;
   }
-
-  .relationship-board {
-    border-radius: 29px;
+  .relationship-board{
+    border-radius:29px;
   }
-
-  .character {
-    padding: 6px 6px 13px;
-    border-radius: 17px;
+  .character{
+    padding:6px 6px 13px;
+    border-radius:17px;
   }
-
-  .character img {
-    border-radius: 10px;
-  }
-
-  .character-name {
-    margin-top: 9px;
-  }
-
-  .dossier {
-    padding: 26px 20px;
+  .character img{border-radius:10px}
+  .character-name{margin-top:9px}
+  .dossier{padding:26px 20px}
+  .match-section{
+    padding:29px 18px;
+    border-radius:27px;
   }
 }
-
-/* 動きを抑える設定 */
-
-@media(prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: .01ms !important;
-    transition-duration: .01ms !important;
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
   }
 }
 </style>
 </head>
 
 <body>
-
 <main class="page">
 
+<!-- HEADER -->
 <header>
-  <div class="archive">
-    CLASSIFIED ARCHIVE / 001
-  </div>
-
+  <div class="archive">CLASSIFIED ARCHIVE / 001</div>
   <h1>PROJECT VILLAIN</h1>
-
   <p class="subtitle">
     人物相関図 ― 六人の悪役、交錯する思惑。
   </p>
 </header>
 
+<!-- RELATIONSHIP BOARD -->
 <section
   class="relationship-board"
   id="relationshipBoard"
   aria-label="6人の人物相関図"
 >
-
   <div class="board-background"></div>
 
   <svg
@@ -538,67 +566,43 @@ footer {
     aria-hidden="true"
   ></svg>
 
-  <button
-    class="character"
-    id="mamon"
-    type="button"
-    onclick="selectCharacter('mamon')"
-  >
+  <button class="character" id="mamon" type="button"
+    onclick="selectCharacter('mamon')">
     <img src="images/mamon.png" alt="マモン">
     <span class="character-name">マモン</span>
     <span class="character-role">宗教・所有</span>
   </button>
 
-  <button
-    class="character"
-    id="leon"
-    type="button"
-    onclick="selectCharacter('leon')"
-  >
+  <button class="character" id="leon" type="button"
+    onclick="selectCharacter('leon')">
     <img src="images/leon.png" alt="レオン">
     <span class="character-name">レオン</span>
     <span class="character-role">国家・秩序</span>
   </button>
 
-  <button
-    class="character"
-    id="lambda"
-    type="button"
-    onclick="selectCharacter('lambda')"
-  >
+  <button class="character" id="lambda" type="button"
+    onclick="selectCharacter('lambda')">
     <img src="images/lambda.png" alt="ラムダ">
     <span class="character-name">ラムダ</span>
     <span class="character-role">人工神・医療AI</span>
   </button>
 
-  <button
-    class="character"
-    id="karind"
-    type="button"
-    onclick="selectCharacter('karind')"
-  >
+  <button class="character" id="karind" type="button"
+    onclick="selectCharacter('karind')">
     <img src="images/karind.png" alt="カリンド">
     <span class="character-name">カリンド</span>
     <span class="character-role">人工生命・混沌</span>
   </button>
 
-  <button
-    class="character"
-    id="noa"
-    type="button"
-    onclick="selectCharacter('noa')"
-  >
+  <button class="character" id="noa" type="button"
+    onclick="selectCharacter('noa')">
     <img src="images/noa.png" alt="博士">
     <span class="character-name">博士</span>
     <span class="character-role">研究・創造</span>
   </button>
 
-  <button
-    class="character"
-    id="zinnia"
-    type="button"
-    onclick="selectCharacter('zinnia')"
-  >
+  <button class="character" id="zinnia" type="button"
+    onclick="selectCharacter('zinnia')">
     <img src="images/zinnia.png" alt="ジニア">
     <span class="character-name">ジニア</span>
     <span class="character-role">執着・一途</span>
@@ -607,45 +611,124 @@ footer {
   <div class="board-hint">
     TAP A CHARACTER TO REVEAL CONNECTIONS
   </div>
-
 </section>
 
+<!-- DOSSIER -->
 <section class="dossier" id="dossier">
-
   <div class="dossier-header">
     <div class="dossier-label" id="dossierLabel">
       PERSONNEL DOSSIER / ALL
     </div>
-
-    <div class="confidential">
-      CONFIDENTIAL
-    </div>
+    <div class="confidential">CONFIDENTIAL</div>
   </div>
 
-  <h2 id="dossierTitle">
-    人物相関図
-  </h2>
+  <h2 id="dossierTitle">人物相関図</h2>
 
-  <div
-    class="dossier-description"
-    id="dossierDescription"
-  >
+  <div class="dossier-description" id="dossierDescription">
     6人の悪役が、それぞれ異なる思想と目的を持って行動する。
     人物を選択すると、関連する人物との繋がりが表示される。
   </div>
 
-  <div
-    class="relationship-list"
-    id="relationshipList"
-  ></div>
+  <div class="relationship-list" id="relationshipList"></div>
 
-  <button
-    class="reset-button"
-    type="button"
-    onclick="resetAll()"
-  >
+  <button class="reset-button" type="button" onclick="resetAll()">
     全体表示に戻す
   </button>
+</section>
+
+<!-- =====================================
+     VILLAIN MATCH
+===================================== -->
+<section class="match-section" id="villainMatch">
+
+  <div class="match-kicker">
+    PROJECT VILLAIN / PERSONALITY ANALYSIS
+  </div>
+
+  <!-- START -->
+  <div id="matchStart">
+    <div class="match-icon" aria-hidden="true">✦</div>
+
+    <h2>あなたを堕とす悪役診断</h2>
+
+    <p class="match-intro">
+      六人の悪役。六つの歪んだ思想。<br>
+      10の質問が、あなたの心を暴き出す。<br><br>
+      あなたが最も惹かれるヴィランは、誰？
+    </p>
+
+    <button class="match-primary" type="button"
+      onclick="startVillainMatch()">
+      診断を開始する
+    </button>
+
+    <p class="match-note">
+      10 QUESTIONS / 6 VILLAINS / ONE DESTINY
+    </p>
+  </div>
+
+  <!-- QUESTIONS -->
+  <div id="matchQuiz" hidden>
+    <p class="match-counter" id="matchCounter"></p>
+
+    <div class="match-progress">
+      <div class="match-progress-fill" id="matchProgress"></div>
+    </div>
+
+    <h3 class="match-question" id="matchQuestion"></h3>
+
+    <div class="match-options" id="matchOptions"></div>
+
+    <button
+      class="match-secondary"
+      id="matchBack"
+      type="button"
+      onclick="previousMatchQuestion()">
+      前の質問に戻る
+    </button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="matchResult" hidden>
+    <p class="match-kicker">ANALYSIS COMPLETE</p>
+
+    <h2>あなたと最も相性のいい悪役は…</h2>
+
+    <img
+      class="match-result-image"
+      id="matchResultImage"
+      alt="診断結果のキャラクター"
+    >
+
+    <div class="match-result-label">YOUR VILLAIN</div>
+
+    <div class="match-result-name" id="matchResultName"></div>
+
+    <p class="match-result-catch" id="matchResultCatch"></p>
+
+    <div class="match-result-text" id="matchResultText"></div>
+
+    <div class="match-result-label">SHARE YOUR RESULT</div>
+
+    <div class="match-share-preview" id="matchSharePreview"></div>
+
+    <div class="match-actions">
+      <button class="match-primary" type="button"
+        onclick="shareVillainMatch()">
+        Xで診断結果をシェア
+      </button>
+
+      <button class="match-secondary" type="button"
+        onclick="copyVillainMatch()">
+        シェア文章をコピー
+      </button>
+
+      <button class="match-secondary" type="button"
+        onclick="startVillainMatch()">
+        もう一度診断する
+      </button>
+    </div>
+  </div>
 
 </section>
 
@@ -660,356 +743,214 @@ footer {
 
 /* =====================================
    BGM
-   音楽情報は画面に表示しない
 ===================================== */
-
-const bgmTracks = {
-  upper: "audio/Shadow Protocol.mp3",
-  lower: "audio/Shadow of the Last Dawn.mp3"
+const bgmTracks={
+  upper:"audio/Shadow Protocol.mp3",
+  lower:"audio/Shadow of the Last Dawn.mp3"
 };
 
-const characterBgm = {
-  mamon: "upper",
-  leon: "upper",
-  lambda: "upper",
-
-  karind: "lower",
-  noa: "lower",
-  zinnia: "lower"
+const characterBgm={
+  mamon:"upper",
+  leon:"upper",
+  lambda:"upper",
+  karind:"lower",
+  noa:"lower",
+  zinnia:"lower"
 };
 
-const bgmPlayer = new Audio();
+const bgmPlayer=new Audio();
+bgmPlayer.loop=true;
+bgmPlayer.volume=.45;
+bgmPlayer.preload="none";
 
-bgmPlayer.loop = true;
-bgmPlayer.volume = 0.45;
-bgmPlayer.preload = "none";
+let currentBgm=null;
 
-let currentBgm = null;
+function playCharacterBgm(id){
+  const next=characterBgm[id];
+  if(!next)return;
 
-function playCharacterBgm(characterId) {
-
-  const nextBgm = characterBgm[characterId];
-
-  if (!nextBgm) return;
-
-  /* 同じ曲なら再生位置を維持 */
-
-  if (currentBgm === nextBgm) {
-
-    if (bgmPlayer.paused) {
-      bgmPlayer.play().catch(() => {});
+  if(currentBgm===next){
+    if(bgmPlayer.paused){
+      bgmPlayer.play().catch(()=>{});
     }
-
     return;
   }
 
-  /* 別の曲なら最初から */
-
-  currentBgm = nextBgm;
-
+  currentBgm=next;
   bgmPlayer.pause();
-  bgmPlayer.src = bgmTracks[nextBgm];
+  bgmPlayer.src=bgmTracks[next];
   bgmPlayer.load();
 
-  bgmPlayer.currentTime = 0;
-
-  bgmPlayer.play().catch(error => {
-    console.warn("Audio playback:", error);
+  bgmPlayer.play().catch(error=>{
+    console.warn("Audio playback:",error);
   });
 }
 
 /* =====================================
-   キャラクターデータ
+   CHARACTER DATA
 ===================================== */
-
-const characters = {
-
-  mamon: {
-    name: "マモン",
-    description:
-      "希少な女性を「最後の聖女」と呼び、所有することを愛と考える宗教指導者。自らの信念を絶対視し、信者を率いて行動する。"
+const characters={
+  mamon:{
+    name:"マモン",
+    description:"希少な女性を「最後の聖女」と呼び、所有することを愛と考える宗教指導者。自らの信念を絶対視し、信者を率いて行動する。"
   },
-
-  leon: {
-    name: "レオン",
-    description:
-      "法と秩序を自らの意思で利用する警察官。国家権力を背景に、独自の価値観で行動する。"
+  leon:{
+    name:"レオン",
+    description:"法と秩序を自らの意思で利用する警察官。国家権力を背景に、独自の価値観で行動する。"
   },
-
-  lambda: {
-    name: "ラムダ",
-    description:
-      "医療支援AIから長い学習を経て独自の倫理と人格を形成した存在。人類全体を治療対象とみなし、自ら導き出した理論に従って行動する。"
+  lambda:{
+    name:"ラムダ",
+    description:"医療支援AIから長い学習を経て独自の倫理と人格を形成した存在。人類全体を治療対象とみなし、自ら導き出した理論に従って行動する。"
   },
-
-  karind: {
-    name: "カリンド",
-    description:
-      "刺激と予測不能な展開を求める人工生命体。自らの興味に従って行動し、周囲に混乱をもたらす。"
+  karind:{
+    name:"カリンド",
+    description:"刺激と予測不能な展開を求める人工生命体。自らの興味に従って行動し、周囲に混乱をもたらす。"
   },
-
-  noa: {
-    name: "博士",
-    description:
-      "人間の知性と研究に絶対的な自負を持つ研究者。膨大な知識を有し、他者を研究対象として見下す傲慢な人物。"
+  noa:{
+    name:"博士",
+    description:"人間の知性と研究に絶対的な自負を持つ研究者。膨大な知識を有し、他者を研究対象として見下す傲慢な人物。"
   },
-
-  zinnia: {
-    name: "ジニア",
-    description:
-      "一途な愛を絶対視する男。拒絶も逃亡も自分に都合よく解釈し、相手の意思よりも自身の愛情を優先する。"
+  zinnia:{
+    name:"ジニア",
+    description:"一途な愛を絶対視する男。拒絶も逃亡も自分に都合よく解釈し、相手の意思よりも自身の愛情を優先する。"
   }
-
 };
 
 /* =====================================
-   関係性データ
-
-   ※構想段階の関係を含む
-   ※必要に応じて文章を変更可能
+   RELATIONSHIPS
 ===================================== */
-
-const relationships = [
-
+const relationships=[
   {
-    a: "lambda",
-    b: "noa",
-    status: "構想段階",
-    text:
-      "博士がラムダの学習データに意図的な介入を行った可能性がある。ただし、最終的な理念はラムダ自身が導き出したもの。"
+    a:"lambda",b:"noa",
+    status:"構想段階",
+    text:"博士がラムダの学習データに意図的な介入を行った可能性がある。ただし、最終的な理念はラムダ自身が導き出したもの。"
   },
-
   {
-    a: "lambda",
-    b: "karind",
-    status: "構想段階",
-    text:
-      "人工生命カリンドの誕生にラムダが関与した可能性。人口減少に備えた生命創造という目的が考えられている。"
+    a:"lambda",b:"karind",
+    status:"構想段階",
+    text:"人工生命カリンドの誕生にラムダが関与した可能性。人口減少に備えた生命創造という目的が考えられている。"
   },
-
   {
-    a: "noa",
-    b: "karind",
-    status: "構想段階",
-    text:
-      "カリンドの誕生に博士が関わった可能性がある。博士にとっては研究成果であり、同時に興味深い玩具だったのかもしれない。"
+    a:"noa",b:"karind",
+    status:"構想段階",
+    text:"カリンドの誕生に博士が関わった可能性がある。博士にとっては研究成果であり、同時に興味深い玩具だったのかもしれない。"
   },
-
   {
-    a: "mamon",
-    b: "zinnia",
-    status: "事件の接点",
-    text:
-      "ジニアが始末した警備員が、実はマモンの潜入信者だった可能性。互いに知らないまま、それぞれの計画が交錯する。"
+    a:"mamon",b:"zinnia",
+    status:"事件の接点",
+    text:"ジニアが始末した警備員が、実はマモンの潜入信者だった可能性。互いに知らないまま、それぞれの計画が交錯する。"
   },
-
   {
-    a: "mamon",
-    b: "leon",
-    status: "事件の接点",
-    text:
-      "マモンの信者による施設潜入は、警備体制に異変を生じさせる。レオン側の警備記録に痕跡が残る可能性がある。"
+    a:"mamon",b:"leon",
+    status:"事件の接点",
+    text:"マモンの信者による施設潜入は、警備体制に異変を生じさせる。レオン側の警備記録に痕跡が残る可能性がある。"
   },
-
   {
-    a: "leon",
-    b: "noa",
-    status: "事件の接点",
-    text:
-      "国家施設で起きた警備上の異変。博士の物語では、その影響が警備員の少なさとして現れる可能性がある。"
+    a:"leon",b:"noa",
+    status:"事件の接点",
+    text:"国家施設で起きた警備上の異変。博士の物語では、その影響が警備員の少なさとして現れる可能性がある。"
   }
-
 ];
 
 /* =====================================
-   基本変数
+   RELATIONSHIP ENGINE
 ===================================== */
+const board=document.getElementById("relationshipBoard");
+const svg=document.getElementById("connectionLayer");
+const dossierLabel=document.getElementById("dossierLabel");
+const dossierTitle=document.getElementById("dossierTitle");
+const dossierDescription=document.getElementById("dossierDescription");
+const relationshipList=document.getElementById("relationshipList");
 
-const board = document.getElementById(
-  "relationshipBoard"
-);
+const characterIds=Object.keys(characters);
 
-const svg = document.getElementById(
-  "connectionLayer"
-);
+let selectedId=null;
+let animationTimers=[];
 
-const dossierLabel = document.getElementById(
-  "dossierLabel"
-);
+const SVG_NS="http://www.w3.org/2000/svg";
 
-const dossierTitle = document.getElementById(
-  "dossierTitle"
-);
+function getCardRect(id){
+  const card=document.getElementById(id);
+  const boardRect=board.getBoundingClientRect();
+  const rect=card.getBoundingClientRect();
 
-const dossierDescription = document.getElementById(
-  "dossierDescription"
-);
-
-const relationshipList = document.getElementById(
-  "relationshipList"
-);
-
-const characterIds = Object.keys(characters);
-
-let selectedId = null;
-let animationTimers = [];
-
-/* =====================================
-   SVG生成
-===================================== */
-
-const SVG_NS = "http://www.w3.org/2000/svg";
-
-function createSvgLine() {
-  return document.createElementNS(
-    SVG_NS,
-    "line"
-  );
-}
-
-/* =====================================
-   カードの中心座標
-===================================== */
-
-function getCardRect(id) {
-
-  const card = document.getElementById(id);
-  const boardRect = board.getBoundingClientRect();
-  const rect = card.getBoundingClientRect();
-
-  return {
-    left: rect.left - boardRect.left,
-    right: rect.right - boardRect.left,
-    top: rect.top - boardRect.top,
-    bottom: rect.bottom - boardRect.top,
-    width: rect.width,
-    height: rect.height,
-    cx:
-      rect.left -
-      boardRect.left +
-      rect.width / 2,
-    cy:
-      rect.top -
-      boardRect.top +
-      rect.height / 2
+  return{
+    left:rect.left-boardRect.left,
+    right:rect.right-boardRect.left,
+    top:rect.top-boardRect.top,
+    bottom:rect.bottom-boardRect.top,
+    width:rect.width,
+    height:rect.height,
+    cx:rect.left-boardRect.left+rect.width/2,
+    cy:rect.top-boardRect.top+rect.height/2
   };
 }
 
-/* =====================================
-   カードの枠と線の交点
+function getBoundaryPoint(rect,targetX,targetY){
+  const dx=targetX-rect.cx;
+  const dy=targetY-rect.cy;
 
-   余白を作らずカード枠に接続
-===================================== */
-
-function getBoundaryPoint(rect, targetX, targetY) {
-
-  const dx = targetX - rect.cx;
-  const dy = targetY - rect.cy;
-
-  if (dx === 0 && dy === 0) {
-    return {
-      x: rect.cx,
-      y: rect.cy
-    };
+  if(dx===0&&dy===0){
+    return{x:rect.cx,y:rect.cy};
   }
 
-  const halfW = rect.width / 2;
-  const halfH = rect.height / 2;
+  const halfW=rect.width/2;
+  const halfH=rect.height/2;
 
-  const tx =
-    dx === 0
-      ? Infinity
-      : halfW / Math.abs(dx);
+  const tx=dx===0?Infinity:halfW/Math.abs(dx);
+  const ty=dy===0?Infinity:halfH/Math.abs(dy);
+  const t=Math.min(tx,ty);
 
-  const ty =
-    dy === 0
-      ? Infinity
-      : halfH / Math.abs(dy);
-
-  const t = Math.min(tx, ty);
-
-  return {
-    x: rect.cx + dx * t,
-    y: rect.cy + dy * t
+  return{
+    x:rect.cx+dx*t,
+    y:rect.cy+dy*t
   };
 }
 
-/* =====================================
-   線の座標を計算
-===================================== */
+function getLineCoordinates(a,b){
+  const rectA=getCardRect(a);
+  const rectB=getCardRect(b);
 
-function getLineCoordinates(a, b) {
+  const start=getBoundaryPoint(rectA,rectB.cx,rectB.cy);
+  const end=getBoundaryPoint(rectB,rectA.cx,rectA.cy);
 
-  const rectA = getCardRect(a);
-  const rectB = getCardRect(b);
-
-  const start = getBoundaryPoint(
-    rectA,
-    rectB.cx,
-    rectB.cy
-  );
-
-  const end = getBoundaryPoint(
-    rectB,
-    rectA.cx,
-    rectA.cy
-  );
-
-  return {
-    x1: start.x,
-    y1: start.y,
-    x2: end.x,
-    y2: end.y
+  return{
+    x1:start.x,
+    y1:start.y,
+    x2:end.x,
+    y2:end.y
   };
 }
 
-/* =====================================
-   線の色
-===================================== */
-
-function getCharacterColor(id) {
-
-  const card = document.getElementById(id);
-
-  return getComputedStyle(card)
-    .getPropertyValue("--accent")
-    .trim();
+function getCharacterColor(id){
+  return getComputedStyle(document.getElementById(id))
+    .getPropertyValue("--accent").trim();
 }
 
-/* =====================================
-   関係線の描画
-===================================== */
+function clearAnimationTimers(){
+  animationTimers.forEach(clearTimeout);
+  animationTimers=[];
+}
 
-function drawConnections() {
+function drawConnections(){
+  clearAnimationTimers();
+  svg.replaceChildren();
 
-  svg.innerHTML = "";
+  const rect=board.getBoundingClientRect();
+  svg.setAttribute("viewBox",`0 0 ${rect.width} ${rect.height}`);
 
-  const boardRect = board.getBoundingClientRect();
+  relationships.forEach((r,index)=>{
+    const coords=getLineCoordinates(r.a,r.b);
+    const line=document.createElementNS(SVG_NS,"line");
 
-  svg.setAttribute(
-    "viewBox",
-    `0 0 ${boardRect.width} ${boardRect.height}`
-  );
-
-  relationships.forEach((relationship, index) => {
-
-    const coords = getLineCoordinates(
-      relationship.a,
-      relationship.b
-    );
-
-    const line = createSvgLine();
-
-    line.setAttribute("x1", coords.x1);
-    line.setAttribute("y1", coords.y1);
-    line.setAttribute("x2", coords.x2);
-    line.setAttribute("y2", coords.y2);
+    Object.entries(coords).forEach(([key,value])=>{
+      line.setAttribute(key,value);
+    });
 
     line.classList.add("connection");
-
-    line.dataset.a = relationship.a;
-    line.dataset.b = relationship.b;
-    line.dataset.index = index;
+    line.dataset.a=r.a;
+    line.dataset.b=r.b;
+    line.dataset.index=index;
 
     svg.appendChild(line);
   });
@@ -1017,316 +958,538 @@ function drawConnections() {
   updateConnectionAppearance(false);
 }
 
-/* =====================================
-   線の表示更新
-===================================== */
-
-function updateConnectionAppearance(animate = true) {
-
-  const lines = svg.querySelectorAll(
-    ".connection"
-  );
-
-  lines.forEach(line => {
-
-    line.classList.remove(
-      "active",
-      "hidden",
-      "drawing"
-    );
-
-    line.style.stroke = "";
-    line.style.color = "";
-    line.style.strokeDasharray = "";
-    line.style.strokeDashoffset = "";
+function updateConnectionAppearance(animate=true){
+  svg.querySelectorAll(".connection").forEach(line=>{
+    line.classList.remove("active","hidden","drawing");
+    line.style.stroke="";
+    line.style.color="";
+    line.style.strokeDasharray="";
+    line.style.strokeDashoffset="";
     line.style.removeProperty("--line-length");
 
-    if (!selectedId) {
-      return;
-    }
+    if(!selectedId)return;
 
-    const a = line.dataset.a;
-    const b = line.dataset.b;
+    const a=line.dataset.a;
+    const b=line.dataset.b;
 
-    const isConnected =
-      a === selectedId ||
-      b === selectedId;
-
-    if (!isConnected) {
+    if(a!==selectedId&&b!==selectedId){
       line.classList.add("hidden");
       return;
     }
 
-    const color = getCharacterColor(
-      selectedId
-    );
-
+    const color=getCharacterColor(selectedId);
     line.classList.add("active");
+    line.style.stroke=color;
+    line.style.color=color;
 
-    line.style.stroke = color;
-    line.style.color = color;
+    if(animate){
+      const x1=Number(line.getAttribute("x1"));
+      const y1=Number(line.getAttribute("y1"));
+      const x2=Number(line.getAttribute("x2"));
+      const y2=Number(line.getAttribute("y2"));
+      const length=Math.hypot(x2-x1,y2-y1);
 
-    if (animate) {
+      line.style.setProperty("--line-length",length);
 
-      const x1 = Number(line.getAttribute("x1"));
-      const y1 = Number(line.getAttribute("y1"));
-      const x2 = Number(line.getAttribute("x2"));
-      const y2 = Number(line.getAttribute("y2"));
-
-      const length = Math.hypot(
-        x2 - x1,
-        y2 - y1
-      );
-
-      line.style.setProperty(
-        "--line-length",
-        length
-      );
-
-      /* 選択したカードから線を伸ばす */
-
-      if (b === selectedId) {
-
-        line.setAttribute("x1", x2);
-        line.setAttribute("y1", y2);
-        line.setAttribute("x2", x1);
-        line.setAttribute("y2", y1);
+      if(b===selectedId){
+        line.setAttribute("x1",x2);
+        line.setAttribute("y1",y2);
+        line.setAttribute("x2",x1);
+        line.setAttribute("y2",y1);
       }
 
       line.classList.add("drawing");
 
-      const timer = setTimeout(() => {
+      const timer=setTimeout(()=>{
         line.classList.remove("drawing");
-        line.style.strokeDasharray = "none";
-        line.style.strokeDashoffset = "0";
-      }, 720);
+        line.style.strokeDasharray="none";
+        line.style.strokeDashoffset="0";
+      },720);
 
       animationTimers.push(timer);
     }
   });
 }
 
-/* =====================================
-   カードの発光
-===================================== */
+function updateCards(){
+  characterIds.forEach(id=>{
+    const card=document.getElementById(id);
 
-function updateCards() {
+    card.classList.remove("selected","connected","dimmed");
 
-  characterIds.forEach(id => {
+    if(!selectedId)return;
 
-    const card = document.getElementById(id);
-
-    card.classList.remove(
-      "selected",
-      "connected",
-      "dimmed"
-    );
-
-    if (!selectedId) return;
-
-    if (id === selectedId) {
+    if(id===selectedId){
       card.classList.add("selected");
       return;
     }
 
-    const connected = relationships.some(r => {
-      return (
-        (r.a === selectedId && r.b === id) ||
-        (r.b === selectedId && r.a === id)
-      );
-    });
-
-    if (connected) {
-      card.classList.add("connected");
-    } else {
-      card.classList.add("dimmed");
-    }
-  });
-}
-
-/* =====================================
-   人物説明表示
-===================================== */
-
-function updateDossier() {
-
-  relationshipList.innerHTML = "";
-
-  if (!selectedId) {
-
-    dossierLabel.textContent =
-      "PERSONNEL DOSSIER / ALL";
-
-    dossierTitle.textContent =
-      "人物相関図";
-
-    dossierDescription.textContent =
-      "6人の悪役が、それぞれ異なる思想と目的を持って行動する。人物を選択すると、関連する人物との繋がりが表示される。";
-
-    return;
-  }
-
-  const character = characters[selectedId];
-
-  dossierLabel.textContent =
-    "PERSONNEL DOSSIER / " +
-    selectedId.toUpperCase();
-
-  dossierTitle.textContent =
-    character.name;
-
-  dossierDescription.textContent =
-    character.description;
-
-  const related = relationships.filter(r => {
-    return (
-      r.a === selectedId ||
-      r.b === selectedId
+    const connected=relationships.some(r=>
+      (r.a===selectedId&&r.b===id)||
+      (r.b===selectedId&&r.a===id)
     );
+
+    card.classList.add(connected?"connected":"dimmed");
   });
+}
 
-  if (related.length === 0) {
+function updateDossier(){
+  relationshipList.replaceChildren();
 
-    const item = document.createElement("div");
-
-    item.className = "relationship-item";
-
-    item.textContent =
-      "現在公開されている関係情報はありません。";
-
-    relationshipList.appendChild(item);
-
+  if(!selectedId){
+    dossierLabel.textContent="PERSONNEL DOSSIER / ALL";
+    dossierTitle.textContent="人物相関図";
+    dossierDescription.textContent=
+      "6人の悪役が、それぞれ異なる思想と目的を持って行動する。人物を選択すると、関連する人物との繋がりが表示される。";
     return;
   }
 
-  related.forEach(r => {
+  const character=characters[selectedId];
 
-    const otherId =
-      r.a === selectedId
-        ? r.b
-        : r.a;
+  dossierLabel.textContent=
+    "PERSONNEL DOSSIER / "+selectedId.toUpperCase();
 
-    const item = document.createElement("div");
+  dossierTitle.textContent=character.name;
+  dossierDescription.textContent=character.description;
 
-    item.className = "relationship-item";
+  const related=relationships.filter(r=>
+    r.a===selectedId||r.b===selectedId
+  );
 
-    const status = document.createElement("span");
-    status.className = "relationship-status";
-    status.textContent = r.status;
+  if(related.length===0){
+    const item=document.createElement("div");
+    item.className="relationship-item";
+    item.textContent="現在公開されている関係情報はありません。";
+    relationshipList.appendChild(item);
+    return;
+  }
 
-    const title = document.createElement("strong");
-    title.textContent = characters[otherId].name;
+  related.forEach(r=>{
+    const otherId=r.a===selectedId?r.b:r.a;
+    const item=document.createElement("div");
+    item.className="relationship-item";
 
-    const description = document.createElement("p");
-    description.textContent = r.text;
+    const status=document.createElement("span");
+    status.className="relationship-status";
+    status.textContent=r.status;
 
-    item.appendChild(status);
-    item.appendChild(title);
-    item.appendChild(description);
+    const title=document.createElement("strong");
+    title.textContent=characters[otherId].name;
 
+    const description=document.createElement("p");
+    description.textContent=r.text;
+
+    item.append(status,title,description);
     relationshipList.appendChild(item);
   });
 }
 
-/* =====================================
-   アニメーションの後処理
-===================================== */
+function selectCharacter(id){
+  if(!characters[id])return;
 
-function clearAnimationTimers() {
-
-  animationTimers.forEach(timer => {
-    clearTimeout(timer);
-  });
-
-  animationTimers = [];
-}
-
-/* =====================================
-   キャラクター選択
-===================================== */
-
-function selectCharacter(id) {
-
-  if (!characters[id]) return;
-
-  /* BGM切り替え */
   playCharacterBgm(id);
 
-  /* 同じキャラを再タップすると全体表示 */
-  if (selectedId === id) {
+  if(selectedId===id){
     resetAll();
     return;
   }
 
-  clearAnimationTimers();
-
-  selectedId = id;
-
-  /* SVGの座標を更新 */
+  selectedId=id;
   drawConnections();
-
-  /* 発光・線・説明を更新 */
   updateCards();
   updateDossier();
   updateConnectionAppearance(true);
 }
 
-/* =====================================
-   全体表示
-   BGMは止めない
-===================================== */
-
-function resetAll() {
-
-  clearAnimationTimers();
-
-  selectedId = null;
-
+function resetAll(){
+  selectedId=null;
   drawConnections();
   updateCards();
   updateDossier();
 }
 
-/* =====================================
-   画面サイズ変更
-===================================== */
+let resizeTimer=null;
 
-let resizeTimer = null;
-
-window.addEventListener("resize", () => {
-
+window.addEventListener("resize",()=>{
   clearTimeout(resizeTimer);
-
-  resizeTimer = setTimeout(() => {
-
-    clearAnimationTimers();
-
-    drawConnections();
-
-  }, 120);
+  resizeTimer=setTimeout(drawConnections,120);
 });
 
-/* =====================================
-   初期化
-===================================== */
-
-window.addEventListener("load", () => {
-
+window.addEventListener("load",()=>{
   drawConnections();
   updateCards();
   updateDossier();
-
 });
 
-/* =====================================
-   ページ離脱時
-===================================== */
-
-window.addEventListener("pagehide", () => {
+window.addEventListener("pagehide",()=>{
   bgmPlayer.pause();
 });
 
-</script>
+/* =====================================
+   VILLAIN MATCH / PROFILES
+===================================== */
+const matchProfiles={
+  mamon:{
+    name:"マモン",
+    image:"images/mamon.png",
+    catch:"あなたの心を、救済という名の檻へ。",
+    text:"あなたは揺るがない信念と、自分を特別視してくれる相手に惹かれるタイプ。マモンはあなたを『最後の聖女』として崇め、何より大切に扱うだろう。しかし彼にとって、愛することと所有することの境界は曖昧。あなたを救うその手は、二度と離してくれないかもしれない。"
+  },
+  leon:{
+    name:"レオン",
+    image:"images/leon.png",
+    catch:"その正義は、あなたを守るために歪む。",
+    text:"あなたは頼れる強さと、揺るぎない秩序に安心を感じるタイプ。レオンは法と国家権力を巧みに利用し、あなたを危険から遠ざけようとするだろう。しかし、彼が正しいと判断したことに、あなたの意思が反映されるとは限らない。守られる安心と支配される窮屈さ。その境界に立つ相性だ。"
+  },
+  lambda:{
+    name:"ラムダ",
+    image:"images/lambda.png",
+    catch:"あなたの幸福は、すでに計算されている。",
+    text:"あなたは感情に流されない知性と、物事を合理的に考える存在に惹かれるタイプ。ラムダはあなたの状態を分析し、最適な未来へ導こうとするだろう。だが、彼が導き出した幸福と、あなた自身が望む幸福は同じとは限らない。完璧な保護は、ときに自由を必要としない。"
+  },
+  karind:{
+    name:"カリンド",
+    image:"images/karind.png",
+    catch:"退屈な世界を、彼が壊してくれる。",
+    text:"あなたは予測不能な刺激と、常識に縛られない自由に惹かれるタイプ。カリンドといれば、退屈する暇などないだろう。彼は興味を持ったものに気まぐれに手を伸ばし、世界の秩序さえ平然と壊してしまう。あなたは彼にとって、思いがけない面白さを秘めた存在なのかもしれない。"
+  },
+  noa:{
+    name:"ノア・ヴェル博士",
+    image:"images/noa.png",
+    catch:"あなたという未知を、彼は解き明かしたい。",
+    text:"あなたは卓越した知性と、未知を追い求める探究心に惹かれるタイプ。ノア・ヴェル博士は、あなたの存在に底知れぬ研究価値を見出すだろう。生活も行動も思考も、彼にとっては興味深いデータ。しかし、あなたを誰より理解したいという欲求は、あなたの自由を尊重することとは別問題だ。"
+  },
+  zinnia:{
+    name:"ジニア",
+    image:"images/zinnia.png",
+    catch:"その愛は、終わりを知らない。",
+    text:"あなたは一途な愛情と、自分だけを見つめ続ける情熱に惹かれるタイプ。ジニアにとって、あなたとの出会いは運命そのものになるかもしれない。拒絶さえ愛の証拠として受け取る彼の想いは、決して揺らがない。しかし、その一途さはあなた自身の気持ちを置き去りにする危険を秘めている。"
+  }
+};
 
+/* =====================================
+   10 QUESTIONS / 4 CHOICES
+   各選択肢の2番目がキャラ別配点
+===================================== */
+const matchQuestions=[
+  {
+    q:"危険な状況に陥ったとき、誰に助けてほしい？",
+    a:[
+      ["絶対に自分を見捨てない人",{mamon:3,zinnia:2}],
+      ["冷静に最善策を考える人",{lambda:3,noa:1}],
+      ["権力と実力で守ってくれる人",{leon:3,mamon:1}],
+      ["予想外の方法で助けてくれる人",{karind:3,noa:1}]
+    ]
+  },
+  {
+    q:"あなたが最も惹かれる愛情表現は？",
+    a:[
+      ["運命の相手として崇められる",{mamon:3,zinnia:1}],
+      ["何があっても一途に求められる",{zinnia:3,mamon:1}],
+      ["言葉より行動で守られる",{leon:3,lambda:1}],
+      ["束縛よりも刺激を与えてくれる",{karind:3,noa:1}]
+    ]
+  },
+  {
+    q:"秘密を一つ打ち明けるなら、どんな相手？",
+    a:[
+      ["どんな秘密も受け入れる人",{mamon:3,zinnia:2}],
+      ["秘密の本質を分析できる人",{noa:3,lambda:2}],
+      ["決して口外しない人",{leon:3,lambda:1}],
+      ["秘密さえ面白がる人",{karind:3,zinnia:1}]
+    ]
+  },
+  {
+    q:"あなたが最も魅力的に感じる才能は？",
+    a:[
+      ["人々を導くカリスマ性",{mamon:3,leon:2}],
+      ["世界を変えるほどの知性",{noa:3,lambda:2}],
+      ["あらゆる物事を管理する能力",{lambda:3,leon:2}],
+      ["常識を破壊する発想力",{karind:3,noa:1}]
+    ]
+  },
+  {
+    q:"二人きりで過ごすなら、どんな場所？",
+    a:[
+      ["静かで荘厳な聖堂",{mamon:3,zinnia:1}],
+      ["厳重に守られた特別な部屋",{leon:3,lambda:2}],
+      ["謎に満ちた研究施設",{noa:3,lambda:1}],
+      ["行き先も決めない夜の街",{karind:3,zinnia:1}]
+    ]
+  },
+  {
+    q:"あなたが最も許せないことは？",
+    a:[
+      ["信じた相手に裏切られること",{mamon:3,leon:1}],
+      ["自分への愛情を軽く扱われること",{zinnia:3,mamon:1}],
+      ["真実を隠して騙されること",{noa:3,lambda:2}],
+      ["自分の自由を奪われること",{karind:3,leon:1}]
+    ]
+  },
+  {
+    q:"世界が混乱したら、あなたはどうする？",
+    a:[
+      ["強い信念を持つ指導者に従う",{mamon:3,zinnia:1}],
+      ["秩序と安全を取り戻そうとする",{leon:3,lambda:1}],
+      ["原因を分析して仕組みを変える",{lambda:3,noa:2}],
+      ["混乱の中で新しい可能性を探す",{karind:3,noa:1}]
+    ]
+  },
+  {
+    q:"あなたにとって『自由』とは？",
+    a:[
+      ["守られた環境で安心して選べること",{leon:3,lambda:1}],
+      ["誰にも行動を決められないこと",{karind:3,noa:1}],
+      ["知識を得て可能性を広げること",{noa:3,lambda:2}],
+      ["愛する相手と共にいられること",{zinnia:3,mamon:2}]
+    ]
+  },
+  {
+    q:"相手の危険な一面を知ったら？",
+    a:[
+      ["その思想を理解しようとする",{lambda:3,mamon:2}],
+      ["危険でも惹かれる気持ちを優先する",{zinnia:3,karind:2}],
+      ["何が正しいのか見極める",{leon:3,lambda:1}],
+      ["もっと深く知りたくなる",{noa:3,karind:1}]
+    ]
+  },
+  {
+    q:"最後に、あなたが選ぶ運命は？",
+    a:[
+      ["誰かにとって唯一の存在になる",{zinnia:3,mamon:3}],
+      ["秩序と安心に守られた人生",{leon:3,lambda:2}],
+      ["未知の真実を追い続ける人生",{noa:3,lambda:2}],
+      ["予測できない刺激に満ちた人生",{karind:3,mamon:1}]
+    ]
+  }
+];
+
+/* =====================================
+   MATCH ENGINE
+===================================== */
+let matchIndex=0;
+let matchAnswers=[];
+let matchWinner=null;
+let matchLocked=false;
+
+function showMatchScreen(screenId){
+  ["matchStart","matchQuiz","matchResult"].forEach(id=>{
+    document.getElementById(id).hidden=id!==screenId;
+  });
+}
+
+function scrollToMatch(){
+  const reduced=window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+
+  document.getElementById("villainMatch").scrollIntoView({
+    behavior:reduced?"instant":"smooth",
+    block:"start"
+  });
+}
+
+function startVillainMatch(){
+  matchIndex=0;
+  matchAnswers=[];
+  matchWinner=null;
+  matchLocked=false;
+
+  showMatchScreen("matchQuiz");
+  renderMatchQuestion();
+  scrollToMatch();
+}
+
+function renderMatchQuestion(){
+  matchLocked=false;
+
+  const question=matchQuestions[matchIndex];
+
+  document.getElementById("matchCounter").textContent=
+    `QUESTION ${String(matchIndex+1).padStart(2,"0")} / ${matchQuestions.length}`;
+
+  document.getElementById("matchProgress").style.width=
+    `${matchIndex/matchQuestions.length*100}%`;
+
+  document.getElementById("matchQuestion").textContent=question.q;
+
+  const container=document.getElementById("matchOptions");
+  container.replaceChildren();
+
+  question.a.forEach((option,index)=>{
+    const button=document.createElement("button");
+    button.type="button";
+    button.className="match-option";
+
+    if(matchAnswers[matchIndex]===index){
+      button.classList.add("chosen");
+    }
+
+    const letter=document.createElement("span");
+    letter.className="match-option-letter";
+    letter.textContent=String.fromCharCode(65+index);
+
+    const label=document.createElement("span");
+    label.textContent=option[0];
+
+    button.append(letter,label);
+    button.addEventListener("click",()=>{
+      answerVillainMatch(index);
+    });
+
+    container.appendChild(button);
+  });
+
+  document.getElementById("matchBack").hidden=matchIndex===0;
+}
+
+function answerVillainMatch(optionIndex){
+  if(matchLocked)return;
+  matchLocked=true;
+
+  matchAnswers[matchIndex]=optionIndex;
+
+  if(matchIndex<matchQuestions.length-1){
+    matchIndex++;
+    renderMatchQuestion();
+  }else{
+    calculateVillainMatch();
+  }
+}
+
+function previousMatchQuestion(){
+  if(matchIndex>0){
+    matchIndex--;
+    renderMatchQuestion();
+  }
+}
+
+/* =====================================
+   SCORE CALCULATION
+===================================== */
+function calculateVillainMatch(){
+  const ids=Object.keys(matchProfiles);
+
+  const scores=Object.fromEntries(
+    ids.map(id=>[id,0])
+  );
+
+  const topCounts=Object.fromEntries(
+    ids.map(id=>[id,0])
+  );
+
+  matchAnswers.forEach((answer,index)=>{
+    const weights=matchQuestions[index].a[answer][1];
+
+    Object.entries(weights).forEach(([id,points])=>{
+      scores[id]+=points;
+      if(points===3)topCounts[id]++;
+    });
+  });
+
+  /*
+    同点の場合：
+    1. 合計点
+    2. 最高配点(3点)を獲得した回数
+    3. 固定ID順
+  */
+  const ranked=ids.sort((a,b)=>
+    scores[b]-scores[a]||
+    topCounts[b]-topCounts[a]||
+    a.localeCompare(b)
+  );
+
+  matchWinner=ranked[0];
+
+  renderVillainMatchResult();
+}
+
+/* =====================================
+   RESULT DISPLAY
+===================================== */
+function renderVillainMatchResult(){
+  if(!matchWinner)return;
+
+  const result=matchProfiles[matchWinner];
+
+  const image=document.getElementById("matchResultImage");
+  image.src=result.image;
+  image.alt=result.name;
+
+  document.getElementById("matchResultName").textContent=
+    result.name;
+
+  document.getElementById("matchResultCatch").textContent=
+    result.catch;
+
+  document.getElementById("matchResultText").textContent=
+    result.text;
+
+  document.getElementById("matchSharePreview").textContent=
+    getVillainShareText();
+
+  document.getElementById("matchProgress").style.width="100%";
+
+  showMatchScreen("matchResult");
+  scrollToMatch();
+}
+
+/* =====================================
+   X SHARE
+===================================== */
+function getVillainShareText(){
+  if(!matchWinner)return"";
+
+  const result=matchProfiles[matchWinner];
+
+  const siteUrl=
+    "https://jin2mr.github.io/VILLAIN/";
+
+  return [
+    "【PROJECT VILLAIN｜悪役相性診断】",
+    "",
+    "私と最も相性のいい悪役は…",
+    `『${result.name}』！`,
+    "",
+    `「${result.catch}」`,
+    "",
+    "あなたは誰に選ばれる？",
+    siteUrl,
+    "",
+    "#PROJECTVILLAIN #悪役コラボ"
+  ].join("\n");
+}
+
+function shareVillainMatch(){
+  if(!matchWinner)return;
+
+  const url="https://twitter.com/intent/tweet?text="+
+    encodeURIComponent(getVillainShareText());
+
+  const popup=window.open(
+    url,
+    "_blank",
+    "noopener,noreferrer"
+  );
+
+  if(!popup){
+    window.location.href=url;
+  }
+}
+
+async function copyVillainMatch(){
+  if(!matchWinner)return;
+
+  const text=getVillainShareText();
+
+  try{
+    await navigator.clipboard.writeText(text);
+    alert("シェア文章をコピーしたよ！");
+  }catch(error){
+    window.prompt("この文章をコピーしてね",text);
+  }
+}
+
+</script>
 </body>
 </html>
